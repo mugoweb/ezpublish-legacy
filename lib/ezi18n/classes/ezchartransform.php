@@ -395,12 +395,10 @@ class eZCharTransform
         $sep  = eZCharTransform::wordSeparator();
         $sepQ = preg_quote( $sep );
         $text = preg_replace( array( "#[^a-zA-Z0-9_!\.-]+#",
-                                     "#^[\.]+|[!\.]+$#", # Remove dots at beginning/end
                                      "#\.\.+#", # Remove double dots
                                      "#[{$sepQ}]+#", # Turn multiple separators into one
-                                     "#^[{$sepQ}]+|[{$sepQ}]+$#" ), # Strip separator from beginning/end
+                                     "#^[{$sepQ}\.]+|[{$sepQ}!\.]+$#" ), # Strip unwanted chars from beginning/end
                               array( $sep,
-                                     $sep,
                                      $sep,
                                      $sep,
                                      "" ),
