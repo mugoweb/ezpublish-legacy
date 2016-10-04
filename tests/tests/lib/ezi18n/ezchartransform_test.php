@@ -1,17 +1,17 @@
 <?php
 /**
- * File containing the eZCharTransFormTests class
+ * File containing the eZCharTransformTests class
  *
  * @package tests
  */
 
-class eZCharTransFormTests extends ezpTestCase
+class eZCharTransformTests extends ezpTestCase
 {
 
     public function __construct()
     {
         parent::__construct();
-        $this->setName( "eZCharTransFormTests" );
+        $this->setName( "eZCharTransformTests" );
     }
 
     public function setUp()

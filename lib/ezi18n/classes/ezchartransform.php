@@ -397,7 +397,7 @@ class eZCharTransform
         $text = preg_replace( array( "#[^a-zA-Z0-9_!\.-]+#",
                                      "#\.\.+#", # Remove double dots
                                      "#[{$sepQ}]+#", # Turn multiple separators into one
-                                     "#^[{$sepQ}\.]+|[{$sepQ}!\.]+$#" ), # Strip unwanted chars from beginning/end
+                                     "#^[{$sepQ}\.]+|[{$sepQ}!\.]+$#" ), # Strip separator and dot from beginning, strip exclemation mark, dot and separator from end
                               array( $sep,
                                      $sep,
                                      $sep,

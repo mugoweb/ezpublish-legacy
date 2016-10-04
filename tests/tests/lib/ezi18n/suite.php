@@ -11,7 +11,7 @@ class eZFileTestSuite extends ezpTestSuite
     {
         parent::__construct();
         $this->setName( "eZFile Test Suite" );
-        $this->addTestSuite( 'eZCharTransFormTests' );
+        $this->addTestSuite( 'eZCharTransformTests' );
     }
 
     public static function suite()
