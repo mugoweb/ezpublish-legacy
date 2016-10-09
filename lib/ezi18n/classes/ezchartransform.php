@@ -410,7 +410,7 @@ class eZCharTransform
     {
         // With IRI support we keep all characters except some reserved ones,
         // they are space, tab, ampersand, semi-colon, forward slash, colon, equal sign, question mark,
-        //          square brackets, parenthesis, plus.
+        //          square brackets, parenthesis, plus, double quote.
         //
         // Note: Spaces and tabs are turned into a dash to make it easier for people to
         //       paste urls from the system and have the whole url recognized
@@ -420,13 +420,11 @@ class eZCharTransform
         $prepost = " ." . $sepQ;
         if ( $sep != "-" )
             $prepost .= "-";
-        $text = preg_replace( array( "#[ \t\\\\%\#&;/:=?\[\]()+]+#",
-                                     "#^[\.]+|[!\.]+$#", # Remove dots at beginning/end
+        $text = preg_replace( array( "#[ \t\\\\%\#&;/:=?\[\]()+\"]+#",
                                      "#\.\.+#", # Remove double dots
                                      "#[{$sepQ}]+#", # Turn multiple separators into one
-                                     "#^[{$prepost}]+|[{$prepost}]+$#" ),
+                                     "#^[{$prepost}]+|[!{$prepost}]+$#" ), # Strip "!", dots and separator from beginning/end
                               array( $sep,
-                                     $sep,
                                      $sep,
                                      $sep,
                                      "" ),

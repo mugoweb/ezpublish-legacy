@@ -38,4 +38,15 @@ class eZCharTransformTests extends ezpTestCase
         $transformed = eZCharTransform::commandUrlCleanup( $objectName );
         $this->assertEquals( $transformed, 'test' );
     }
+
+    public function testCommandUrlCleanupIRI()
+    {
+        $objectName = '.täst."';
+        $transformed = eZCharTransform::commandUrlCleanupIRI( $objectName );
+        $this->assertEquals( 'täst', $transformed );
+
+        $objectName = '.test!"';
+        $transformed = eZCharTransform::commandUrlCleanupIRI( $objectName );
+        $this->assertEquals( 'test', $transformed );
+    }
 }
