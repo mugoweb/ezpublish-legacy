@@ -83,7 +83,7 @@ class ezpRestHttpRequestParserRegression extends ezpRegressionTest
     private static function normalizedVarExport( $var )
     {
         $var = var_export( $var, true );
-        if ( PHP_VERSION_ID < 50430 )
+        if ( PHP_VERSION_ID <= 50509 )
         {
             $var = preg_replace( '%(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})%', '$1.000000', $var );
         }
