@@ -395,6 +395,9 @@ class eZContentObjectAttribute extends eZPersistentObject
                                                 $asObject );
     }
 
+    /**
+     * @return eZContentObject|null
+     */
     function object()
     {
         if( isset( $this->ContentObjectID ) and $this->ContentObjectID )
@@ -404,6 +407,9 @@ class eZContentObjectAttribute extends eZPersistentObject
         return null;
     }
 
+    /**
+     * @return eZContentObjectVersion
+     */
     function objectVersion()
     {
         return eZContentObjectVersion::fetchVersion( $this->Version, $this->ContentObjectID );
