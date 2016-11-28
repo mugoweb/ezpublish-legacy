@@ -386,9 +386,14 @@ class eZObjectRelationListType extends eZDataType
         return $newObjectInstance->attribute( 'id' );
     }
 
+    /**
+     * @param eZContentObjectAttribute $attribute
+     * @return bool
+     */
     function storeObjectAttribute( $attribute )
     {
         $content = $attribute->content();
+
         if ( isset( $content['new_object'] ) )
         {
             $newID = $this->createNewObject( $attribute, $content['new_object'] );
@@ -403,66 +408,111 @@ class eZObjectRelationListType extends eZDataType
             $attribute->setContent( $content );
         }
 
-        $contentClassAttributeID = $attribute->ContentClassAttributeID;
-        $contentObjectID = $attribute->ContentObjectID;
-        $contentObjectVersion = $attribute->Version;
-
-        $obj = $attribute->object();
-        //get eZContentObjectVersion
-        $currVerobj = $obj->version( $contentObjectVersion );
-
-        // create translation List
-        // $translationList will contain for example eng-GB, ita-IT etc.
-        $translationList = $currVerobj->translations( false );
-
-        // get current language_code
-        $langCode = $attribute->attribute( 'language_code' );
-        // get count of LanguageCode in translationList
-        $countTsl = count( $translationList );
-        // order by asc
-        sort( $translationList );
-
-        // check if previous relation(s) should first be removed
-        if ( !$attribute->contentClassAttributeCanTranslate() )
-        {
-             $obj->removeContentObjectRelation( false, $contentObjectVersion, $contentClassAttributeID, eZContentObject::RELATION_ATTRIBUTE );
-        }
+        $this->updateObjectRelations( $attribute );
 
         foreach( $content['relation_list'] as $relationItem )
         {
             // Installing content object, postUnserialize is not called yet,
             // so object's ID is unknown.
-            if ( !$relationItem['contentobject_id'] || !isset( $relationItem['contentobject_id'] ) )
-                continue;
-
-            $subObjectID = $relationItem['contentobject_id'];
-            $subObjectVersion = $relationItem['contentobject_version'];
-
-            eZContentObject::fetch( $contentObjectID )->addContentObjectRelation( $subObjectID, $contentObjectVersion, $contentClassAttributeID, eZContentObject::RELATION_ATTRIBUTE );
-
-            if ( $relationItem['is_modified'] && isset( $content['temp'][$subObjectID]['object' ] ) )
+            if( isset( $relationItem[ 'contentobject_id' ] ) && (int) $relationItem[ 'contentobject_id' ] )
             {
-                // handling sub-objects
-                $object = $content['temp'][$subObjectID]['object'];
-                if ( $object )
-                {
-                    $attributes = $content['temp'][$subObjectID]['attributes'];
-                    $attributeInputMap = $content['temp'][$subObjectID]['attribute-input-map'];
-                    $object->storeInput( $attributes,
-                                         $attributeInputMap );
-                    $version = eZContentObjectVersion::fetchVersion( $subObjectVersion, $subObjectID );
-                    if ( $version )
-                    {
-                        $version->setAttribute( 'modified', time() );
-                        $version->setAttribute( 'status', eZContentObjectVersion::STATUS_DRAFT );
-                        $version->store();
-                    }
+                // Edit in place? - Move to a function
+                $subObjectID = $relationItem[ 'contentobject_id' ];
+                $subObjectVersion = $relationItem[ 'contentobject_version' ];
 
-                    $object->store();
+                if ( $relationItem['is_modified'] && isset( $content['temp'][$subObjectID]['object' ] ) )
+                {
+                    // handling sub-objects
+                    $object = $content['temp'][$subObjectID]['object'];
+                    if ( $object )
+                    {
+                        $attributes = $content['temp'][$subObjectID]['attributes'];
+                        $attributeInputMap = $content['temp'][$subObjectID]['attribute-input-map'];
+                        $object->storeInput( $attributes,
+                            $attributeInputMap );
+                        $version = eZContentObjectVersion::fetchVersion( $subObjectVersion, $subObjectID );
+                        if ( $version )
+                        {
+                            $version->setAttribute( 'modified', time() );
+                            $version->setAttribute( 'status', eZContentObjectVersion::STATUS_DRAFT );
+                            $version->store();
+                        }
+
+                        $object->store();
+                    }
                 }
             }
         }
+
         return $this->storeObjectAttributeContent( $attribute, $content );
+    }
+
+    /**
+     * Building a list of all object relations for all translations, using
+     * published attributes in all available translations. For the current
+     * language we're not using the published version but the submitted $attribute
+     *
+     * @param eZContentObjectAttribute $attribute
+     * @return array
+     */
+    private function updateObjectRelations( $attribute )
+    {
+        $contentObjectIds = array();
+
+        $publishedVersion = $attribute->object()->currentVersion();
+        $languageMask = eZContentLanguage::decodeLanguageMask( $publishedVersion->languageMask() );
+
+        foreach( $languageMask[ 'language_list' ] as $languageId )
+        {
+            if( $languageId != $attribute->LanguageID )
+            {
+                $loopAttribute = eZContentObjectAttribute::fetchByClassAttributeID(
+                    $attribute->ContentClassAttributeID,
+                    $attribute->ContentObjectID,
+                    $publishedVersion->Version,
+                    $languageId
+                );
+            }
+            else
+            {
+                $loopAttribute = $attribute;
+            }
+
+            if( $loopAttribute )
+            {
+                $content = $loopAttribute->content();
+                if( !empty( $content[ 'relation_list' ] ) )
+                {
+                    foreach( $content[ 'relation_list' ] as $relation )
+                    {
+                        $contentObjectIds[ $relation[ 'contentobject_id' ] ] = $relation[ 'contentobject_id' ];
+                    }
+                }
+            }
+        }
+
+        // Remove all relations for the handled version
+        $attribute->object()->removeContentObjectRelation(
+            false,
+            $attribute->Version,
+            $attribute->ContentClassAttributeID,
+            eZContentObject::RELATION_ATTRIBUTE
+        );
+
+        if( !empty( $contentObjectIds ) )
+        {
+            foreach( $contentObjectIds as $id )
+            {
+                $attribute->object()->addContentObjectRelation(
+                    $id,
+                    $attribute->Version,
+                    $attribute->ContentClassAttributeID,
+                    eZContentObject::RELATION_ATTRIBUTE
+                );
+            }
+        }
+
+        return $this;
     }
 
     function onPublish( $contentObjectAttribute, $contentObject, $publishedNodes )
@@ -1008,12 +1058,6 @@ class eZObjectRelationListType extends eZDataType
                     if ( in_array( $relationItem['contentobject_id'], $selections ) )
                     {
                         $this->removeRelationObject( $contentObjectAttribute, $relationItem );
-
-                        $contentObjectAttribute->object()->removeContentObjectRelation(
-                            $relationItem[ 'contentobject_id' ],
-                            $contentObjectAttribute->Version,
-                            $contentObjectAttribute->attribute( 'contentclassattribute_id' )
-                        );
                     }
                     else
                     {

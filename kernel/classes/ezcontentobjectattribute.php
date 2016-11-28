@@ -178,6 +178,14 @@ class eZContentObjectAttribute extends eZPersistentObject
         }
     }
 
+    /**
+     * @param $classAttributeID
+     * @param $objectID
+     * @param $version
+     * @param $languageID
+     * @param bool $asObject
+     * @return eZContentObjectAttribute
+     */
     static function fetchByClassAttributeID( $classAttributeID, $objectID, $version, $languageID, $asObject = true )
     {
         return eZPersistentObject::fetchObject( eZContentObjectAttribute::definition(),
