@@ -6,6 +6,7 @@
 /bin/win32
 /vendor
 /composer.lock
+/var/*
 #
 # Extension directory
 #
@@ -21,3 +22,5 @@
 !/settings/siteaccess/base
 !/settings/siteaccess/mysite
 !/settings/siteaccess/plain
+# Handle empty directories
+!.gitkeep
