@@ -42,27 +42,27 @@ class ezpDatabaseTestSuite extends ezpTestSuite
         $this->setDatabaseEnv();
     }
 
-	/**
-	 * Sets up the database environment
-	 */
+    /**
+     * Sets up the database environment
+     */
     protected function setDatabaseEnv()
     {
-		if ( !ezpTestRunner::dbPerTest() && !self::$isDatabaseSetup )
-		{
-			$dsn = ezpTestRunner::dsn();
-			$this->sharedFixture = ezpTestDatabaseHelper::create( $dsn );
+        if ( !ezpTestRunner::dbPerTest() && !self::$isDatabaseSetup )
+        {
+            $dsn = ezpTestRunner::dsn();
+            $this->sharedFixture = ezpTestDatabaseHelper::create( $dsn );
 
-			if ( $this->insertDefaultData === true )
-				ezpTestDatabaseHelper::insertDefaultData( $this->sharedFixture );
+            if ( $this->insertDefaultData === true )
+                ezpTestDatabaseHelper::insertDefaultData( $this->sharedFixture );
 
-			if ( count( $this->sqlFiles ) > 0 )
-			{
-				ezpTestDatabaseHelper::insertSqlData( $this->sharedFixture, $this->sqlFiles );
-			}
+            if ( count( $this->sqlFiles ) > 0 )
+            {
+                ezpTestDatabaseHelper::insertSqlData( $this->sharedFixture, $this->sqlFiles );
+            }
 
-			eZDB::setInstance( $this->sharedFixture );
-			self::$isDatabaseSetup = true;
-		}
+            eZDB::setInstance( $this->sharedFixture );
+            self::$isDatabaseSetup = true;
+        }
     }
 }
 
