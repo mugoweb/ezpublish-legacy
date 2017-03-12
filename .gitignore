@@ -7,20 +7,3 @@
 /vendor
 /composer.lock
 /var/*
-#
-# Extension directory
-#
-/extension/*
-!/extension/ezformtoken
-!/extension/ezjscore
-!/extension/ezoe
-#
-# settings directory
-#
-/settings/override
-/settings/siteaccess/*
-!/settings/siteaccess/base
-!/settings/siteaccess/mysite
-!/settings/siteaccess/plain
-# Handle empty directories
-!.gitkeep
