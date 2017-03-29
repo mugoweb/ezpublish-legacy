@@ -1749,7 +1749,7 @@ class eZOEXMLInput extends eZXMLInputHandler
                 else
                 {
                    $customAttributePart .= 'attribute_separation' . $attribute->name . '|' .
-					   htmlspecialchars( $attribute->value );
+                       htmlspecialchars( $attribute->value );
                 }
                 if ( isset( self::$customAttributeStyleMap[$attribute->name] ) )
                 {
