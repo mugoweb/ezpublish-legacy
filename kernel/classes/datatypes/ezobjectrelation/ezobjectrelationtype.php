@@ -630,7 +630,7 @@ class eZObjectRelationType extends eZDataType
                     $attributes = $object->contentObjectAttributes();
                 }
 
-                return eZContentObjectAttribute::metaDataArray( $attributes );
+                return eZObjectRelationListType::metaDataArray( $attributes );
             }
             else
             {
