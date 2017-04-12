@@ -1935,6 +1935,8 @@ class eZObjectRelationListType extends eZDataType
     {
         return true;
     }
+    
+    /// \privatesection
 
     /**
      * Goes trough all attributes and fetches metadata for the ones that is searchable.
@@ -1943,7 +1945,7 @@ class eZObjectRelationListType extends eZDataType
      * @param $attributes
      * @return array|bool
      */
-    public static function metaDataArray( &$attributes )
+    private static function metaDataArray( &$attributes )
     {
         $metaDataArray = array();
         if ( !is_array( $attributes ) )
@@ -1963,8 +1965,10 @@ class eZObjectRelationListType extends eZDataType
                 {
                     if ( !is_array( $attributeMetaData ) )
                     {
-                        $attributeMetaData = array( array( 'id' => '',
-                            'text' => $attributeMetaData ) );
+                        $attributeMetaData = array( array(
+                            'id' => '',
+                            'text' => $attributeMetaData
+                        ) );
                     }
                     $metaDataArray = array_merge( $metaDataArray, $attributeMetaData );
                 }
@@ -1973,7 +1977,6 @@ class eZObjectRelationListType extends eZDataType
         return $metaDataArray;
     }
 
-    /// \privatesection
 }
 
 eZDataType::register( eZObjectRelationListType::DATA_TYPE_STRING, "eZObjectRelationListType" );
