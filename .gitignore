@@ -7,3 +7,5 @@
 /vendor
 /composer.lock
 /var/*
+# Except for any .gitkeep file in the tree. This is added only to keep directories in the repository.
+!.gitkeep
