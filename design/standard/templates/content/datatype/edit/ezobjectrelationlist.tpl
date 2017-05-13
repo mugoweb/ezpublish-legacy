@@ -33,7 +33,7 @@
                 {if $attribute.contentclass_attribute.is_required|not}
                     <option value="no_relation" {if eq( $attribute.content.relation_list|count, 0 )} selected="selected"{/if}>{'No relation'|i18n( 'design/standard/content/datatype' )}</option>
                 {/if}
-                {section var=node loop=$nodesList}
+                {foreach $nodesList as $node}
                     <option value="{$node.contentobject_id}"
                     {if ne( count( $attribute.content.relation_list ), 0)}
                     {foreach $attribute.content.relation_list as $item}
@@ -45,7 +45,7 @@
                     {/if}
                     >
                     {$node.name|wash}</option>
-                {/section}
+                {/foreach}
             </select>
             {/if}
             </div>
@@ -56,7 +56,7 @@
             {if $attribute.contentclass_attribute.is_required|not}
                 <input type="radio" name="{$attribute_base}_data_object_relation_list_{$attribute.id}[]" value="no_relation"
                 {if eq( $attribute.content.relation_list|count, 0 )} checked="checked"{/if}>{'No relation'|i18n( 'design/standard/content/datatype' )}<br />{/if}
-            {section var=node loop=$nodesList}
+            {foreach $nodesList as $node}
                 <input type="radio" name="{$attribute_base}_data_object_relation_list_{$attribute.id}[]" value="{$node.contentobject_id}"
                 {if ne( count( $attribute.content.relation_list ), 0)}
                 {foreach $attribute.content.relation_list as $item}
@@ -68,11 +68,11 @@
                 {/if}
                 >
                 {$node.name|wash} <br/>
-            {/section}
+            {/foreach}
         {/case}
 
         {case match=3} {* check boxes list *}
-            {section var=node loop=$nodesList}
+            {foreach $nodesList as $node}
                 <input type="checkbox" name="{$attribute_base}_data_object_relation_list_{$attribute.id}[{$node.node_id}]" value="{$node.contentobject_id}"
                 {if ne( count( $attribute.content.relation_list ), 0)}
                 {foreach $attribute.content.relation_list as $item}
@@ -84,14 +84,14 @@
                 {/if}
                 />
                 {$node.name|wash} <br/>
-            {/section}
+            {/foreach}
         {/case}
 
         {case match=4} {* Multiple List *}
             <div class="buttonblock">
             {if ne( count( $nodesList ), 0)}
             <select name="{$attribute_base}_data_object_relation_list_{$attribute.id}[]" size="10" multiple>
-                {section var=node loop=$nodesList}
+                {foreach $nodesList as $node}
                     <option value="{$node.contentobject_id}"
                     {if ne( count( $attribute.content.relation_list ), 0)}
                     {foreach $attribute.content.relation_list as $item}
@@ -103,7 +103,7 @@
                     {/if}
                     >
                     {$node.name|wash}</option>
-                {/section}
+                {/foreach}
             </select>
             {/if}
             </div>
@@ -113,7 +113,7 @@
             <div class="buttonblock">
             <div class="templatebasedeor">
                 <ul>
-                {section var=node loop=$nodesList}
+                {foreach $nodesList as $node}
                    <li>
                         <input type="checkbox" name="{$attribute_base}_data_object_relation_list_{$attribute.id}[{$node.node_id}]" value="{$node.contentobject_id}"
                         {if ne( count( $attribute.content.relation_list ), 0)}
@@ -127,7 +127,7 @@
                         >
                         {node_view_gui content_node=$node view=objectrelationlist}
                    </li>
-                {/section}
+                {/foreach}
                 </ul>
             </div>
             </div>
@@ -142,7 +142,7 @@
                          <input value="no_relation" type="radio" name="{$attribute_base}_data_object_relation_list_{$attribute.id}[]" {if eq( $attribute.content.relation_list|count, 0 )} checked="checked"{/if}>{'No relation'|i18n( 'design/standard/content/datatype' )}<br />
                     </li>
                 {/if}
-                {section var=node loop=$nodesList}
+                {foreach $nodesList as $node}
                     <li>
                         <input type="radio" name="{$attribute_base}_data_object_relation_list_{$attribute.id}[]" value="{$node.contentobject_id}"
                         {if ne( count( $attribute.content.relation_list ), 0)}
@@ -156,7 +156,7 @@
                         >
                         {node_view_gui content_node=$node view=objectrelationlist}
                     </li>
-                {/section}
+                {/foreach}
            </ul>
            </div>
            </div>
@@ -184,7 +184,7 @@
         {/if}
 
         {* Create object *}
-        {section show = and( is_set( $class_content.default_placement.node_id ), ne( 0, $class_content.default_placement.node_id ), ne( '', $class_content.object_class ) )}
+        {if and( is_set( $class_content.default_placement.node_id ), ne( 0, $class_content.default_placement.node_id ), ne( '', $class_content.object_class ) )}
             {def $defaultNode = fetch( content, node, hash( node_id, $class_content.default_placement.node_id ))}
             {if and( is_set( $defaultNode ), $defaultNode.can_create )}
                 <div id='create_new_object_{$attribute.id}' style="display:none;">
@@ -195,7 +195,7 @@
                        onclick="var divfield=document.getElementById('create_new_object_{$attribute.id}');divfield.style.display='block';
                                 var editfield=document.getElementById('attribute_{$attribute.id}_new_object_name');editfield.focus();this.style.display='none';return false;" />
            {/if}
-        {/section}
+        {/if}
 
         {/let}
         {/default}
@@ -397,23 +397,23 @@
         {/if}
 
         <div class="block inline-block">
-	        {if $attribute.content.relation_list}
-	            <input class="button ezobject-relation-remove-button" type="submit" name="CustomActionButton[{$attribute.id}_remove_objects]" value="{'Remove selected'|i18n( 'design/standard/content/datatype' )}" title="{'Remove selected elements from the relation'|i18n( 'design/standard/content/datatype' )}" />
-	        {else}
-	            <input class="button-disabled ezobject-relation-remove-button" type="submit" name="CustomActionButton[{$attribute.id}_remove_objects]" value="{'Remove selected'|i18n( 'design/standard/content/datatype' )}" disabled="disabled" />
-	        {/if}
+            {if $attribute.content.relation_list}
+                <input class="button ezobject-relation-remove-button" type="submit" name="CustomActionButton[{$attribute.id}_remove_objects]" value="{'Remove selected'|i18n( 'design/standard/content/datatype' )}" title="{'Remove selected elements from the relation'|i18n( 'design/standard/content/datatype' )}" />
+            {else}
+                <input class="button-disabled ezobject-relation-remove-button" type="submit" name="CustomActionButton[{$attribute.id}_remove_objects]" value="{'Remove selected'|i18n( 'design/standard/content/datatype' )}" disabled="disabled" />
+            {/if}
         </div>
         <h4>{'Add objects in the relation'|i18n( 'design/standard/content/datatype' )}</h4>
         <div class="left">
-	        {if $browse_object_start_node}
-	            <input type="hidden" name="{$attribute_base}_browse_for_object_start_node[{$attribute.id}]" value="{$browse_object_start_node|wash}" />
-	        {/if}
+            {if $browse_object_start_node}
+                <input type="hidden" name="{$attribute_base}_browse_for_object_start_node[{$attribute.id}]" value="{$browse_object_start_node|wash}" />
+            {/if}
 
             {if is_set( $attribute.class_content.class_constraint_list[0] )}
                 <input type="hidden" name="{$attribute_base}_browse_for_object_class_constraint_list[{$attribute.id}]" value="{$attribute.class_content.class_constraint_list|implode(',')}" />
             {/if}
 
-	        <input class="button" type="submit" name="CustomActionButton[{$attribute.id}_browse_objects]" value="{'Add existing objects'|i18n( 'design/standard/content/datatype' )}" title="{'Browse to add existing objects in this relation'|i18n( 'design/standard/content/datatype' )}" />
+            <input class="button" type="submit" name="CustomActionButton[{$attribute.id}_browse_objects]" value="{'Add existing objects'|i18n( 'design/standard/content/datatype' )}" title="{'Browse to add existing objects in this relation'|i18n( 'design/standard/content/datatype' )}" />
             {include uri='design:content/datatype/edit/ezobjectrelationlist_ajaxuploader.tpl'}
 
         </div>
@@ -425,7 +425,7 @@
         <div class="block inline-block ezobject-relation-search-browse hide"></div>
 
         {include uri='design:content/datatype/edit/ezobjectrelation_ajax_search.tpl'}
-	{/if}
+    {/if}
     </div><!-- /div class="block" id="ezobjectrelationlist_browse_{$attribute.id}" -->
 {/if}
 {/let}
