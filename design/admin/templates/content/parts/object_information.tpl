@@ -4,12 +4,6 @@
     </div>
 
     <div class="box-content">
-        {* Object ID *}
-        <p>
-            <label>{'ID'|i18n( 'design/admin/content/history' )}:</label>
-            {$object.id}
-        </p>
-
         {* Created *}
         <p>
             <label>{'Created'|i18n( 'design/admin/content/history' )}:</label>
@@ -19,6 +13,11 @@
             {else}
                 {'Not yet published'|i18n( 'design/admin/content/history' )}
             {/if}
+        </p>
+        {* Object ID *}
+        <p>
+            <label>{'ID'|i18n( 'design/admin/content/history' )}:</label>
+            {$object.id}
         </p>
     </div>
 
@@ -30,9 +29,9 @@
     <div class="box-content">
         {if $object.published}
             <p>
-                <label>{'Created'|i18n( 'design/admin/content/history' )}:</label>
-                {$object.current.creator.name|wash}<br />
-                {$object.current.modified|l10n( shortdatetime )}
+                <label>{'Published'|i18n( 'design/admin/content/history' )}:</label>
+                {$object.current.modified|l10n( shortdatetime )}<br />
+                {$object.current.creator.name|wash}
             </p>
             <p>
                 <label>{'Version'|i18n( 'design/admin/content/history' )}:</label>
