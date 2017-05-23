@@ -21,6 +21,8 @@ class eZImageType extends eZDataType
 {
     const FILESIZE_FIELD = 'data_int1';
     const FILESIZE_VARIABLE = '_ezimage_max_filesize_';
+    const ALTTEXTREQUIRED_FIELD = 'data_int2';
+    const ALTTEXTREQUIRED_VARIABLE = 'ContentAttribute_alttextrequired_checked';
     const DATA_TYPE_STRING = "ezimage";
 
     function eZImageType()
@@ -204,8 +206,10 @@ class eZImageType extends eZDataType
      */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
+
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
         $httpFileName = $base . "_data_imagename_" . $contentObjectAttribute->attribute( "id" );
+        $httpRequiredImageAltTextName = $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" );
         $maxSize = 1024 * 1024 * $classAttribute->attribute( self::FILESIZE_FIELD );
         $mustUpload = false;
 
@@ -222,20 +226,41 @@ class eZImageType extends eZDataType
         $canFetchResult = eZHTTPFile::canFetch( $httpFileName, $maxSize );
         if ( isset( $_FILES[$httpFileName] ) and  $_FILES[$httpFileName]["tmp_name"] != "" )
         {
-             $imagefile = $_FILES[$httpFileName]['tmp_name'];
-             if ( !$_FILES[$httpFileName]["size"] )
-             {
+            $imagefile = $_FILES[$httpFileName]['tmp_name'];
+            if ( !$_FILES[$httpFileName]["size"] )
+            {
                 $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
-                                                                     'The image file must have non-zero size.' ) );
+                                                                          'The image file must have non-zero size.' ) );
                 return eZInputValidator::STATE_INVALID;
-             }
+            }
 
-             if( !self::validateImageFile( $imagefile ) )
-             {
-                 $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid image file is required.' ) );
-                 return eZInputValidator::STATE_INVALID;
-             }
+            if( !self::validateImageFile( $imagefile ) )
+            {
+                $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid image file is required.' ) );
+                return eZInputValidator::STATE_INVALID;
+            }
+
+            if( !self::validateRequiredImageAltText( $httpRequiredImageAltTextName, $http, $contentObjectAttribute ) )
+            {
+                $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'Alternate text is required for this image.' ) );
+                return eZInputValidator::STATE_INVALID;
+            }
         }
+        else
+        {
+            // Throw error message if there is an image without alternative text when alt text is required.
+            $data_text  = simplexml_load_string( $contentObjectAttribute->attribute('data_text') );
+            $attributes = $data_text->attributes();
+            if( $attributes[ 'filename' ] != '' )
+            {
+                if( !self::validateRequiredImageAltText( $httpRequiredImageAltTextName, $http, $contentObjectAttribute ) )
+                {
+                    $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'Alternate text is required for this image.' ) );
+                    return eZInputValidator::STATE_INVALID;
+                }
+            }
+        }
+
         if ( $mustUpload && $canFetchResult == eZHTTPFile::UPLOADEDFILE_DOES_NOT_EXIST )
         {
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
@@ -266,6 +291,40 @@ class eZImageType extends eZDataType
         return in_array( $imageType, $ini->variable( 'ValidUploadFormats', 'MIMEList' ) );
     }
 
+    private static function validateRequiredImageAltText( $httpRequiredImageAltTextName, $http, $contentObjectAttribute )
+    {
+        // Does class require alternative text?
+        if( $contentObjectAttribute->contentClassAttribute()->DataInt2 != 0 )
+        {
+            if( $http->hasPostVariable( $httpRequiredImageAltTextName ) )
+            {
+                $imageAltText = $http->postVariable( $httpRequiredImageAltTextName );
+
+                if( self::validateImageAltText( $imageAltText ) )
+                {
+                    return true;
+                }
+            }
+        }
+        else
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Public function called from this class and eZContentUpload::handleUpload [ kernel/classes/ezcontentupload.php ]
+    public static function validateImageAltText(  $imageAltText )
+    {
+        // This is a pretty lean check for alt text, merely checking for a string of any length
+        // Consider expanding later to include warnings for insufficient alternative text
+        // such as matching filename, containing underscores, etc.
+        if( $imageAltText == '' )
+            return false;
+        return true;
+    }
+
     /**
      * Fetch object attribute http input, override the ezDataType method
      * This method is triggered when submiting a http form which includes Image class
@@ -280,6 +339,7 @@ class eZImageType extends eZDataType
         $result = false;
         $imageAltText = false;
         $hasImageAltText = false;
+
         if ( $http->hasPostVariable( $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" ) ) )
         {
             $imageAltText = $http->postVariable( $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" ) );
@@ -326,6 +386,7 @@ class eZImageType extends eZDataType
 
                 $imageHandler->initializeFromHTTPFile( $httpFile, $imageAltText );
             }
+
             if ( $imageHandler->isStorageRequired() )
             {
                 $imageHandler->store( $contentObjectAttribute );
@@ -464,14 +525,25 @@ class eZImageType extends eZDataType
 
     function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
+        $rtn = false;
+
+        /*
+        if ( $http->hasPostVariable( self::ALTTEXTREQUIRED_VARIABLE ) )
+        {
+            $requiredCheckedArray = $http->postVariable( self::ALTTEXTREQUIRED_VARIABLE );
+            $rtn = true;
+            $classAttribute->setAttribute( self::ALTTEXTREQUIRED_FIELD, $requiredCheckedArray );
+        }
+        */
+
         $filesizeName = $base . self::FILESIZE_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $filesizeName ) )
         {
             $filesizeValue = $http->postVariable( $filesizeName );
             $classAttribute->setAttribute( self::FILESIZE_FIELD, $filesizeValue );
-            return true;
+            $rtn = true;
         }
-        return false;
+        return $rtn;
     }
 
     function customObjectAttributeHTTPAction( $http, $action, $contentObjectAttribute, $parameters )

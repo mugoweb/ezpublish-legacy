@@ -466,7 +466,7 @@ class eZContentUpload
      *
      * @return boolean
      */
-    function handleUpload( &$result, $httpFileIdentifier, $location, $existingNode, $nameString = '', $localeCode = false, $publish = true )
+    function handleUpload( &$result, $httpFileIdentifier, $location, $existingNode, $nameString = '', $localeCode = false, $publish = true, $httpImageAltText='' )
     {
         $result = array( 'errors' => array(),
                          'notices' => array(),
@@ -584,12 +584,23 @@ class eZContentUpload
         if ( $classIdentifier == 'image' )
         {
             $classAttribute = $dataMap['image'];
+
             $maxSize = 1024 * 1024 * $classAttribute->attribute( 'data_int1' );
             if ( $maxSize != 0 && $file->attribute( 'filesize' ) > $maxSize )
             {
                 $result['errors'][] =
                     array( 'description' => ezpI18n::tr( 'kernel/content/upload',
                                                     'The size of the uploaded file exceeds the limit set for this site: %1 bytes.', null, array( $maxSize ) ) );
+                return false;
+            }
+
+            $imageAltTextRequired = $classAttribute->attribute( 'data_int2' );
+
+            if ( $imageAltTextRequired != 0 && !eZImageType::validateImageAltText( $httpImageAltText ) )
+            {
+                $result['errors'][] =
+                    array( 'description' => ezpI18n::tr( 'kernel/content/upload',
+                                                         'This image requires alternative text.' ) );
                 return false;
             }
         }

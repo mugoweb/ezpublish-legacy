@@ -104,6 +104,12 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
         $objectName = trim( $http->postVariable( 'objectName' ) );
     }
 
+    $httpImageAltText = '';
+    if ( $http->hasPostVariable( 'ContentObjectAttribute_image' ) )
+    {
+        $httpImageAltText = trim( $http->postVariable( 'ContentObjectAttribute_image' ) );
+    }
+
     try
     {
         $uploadedOk = $upload->handleUpload(
@@ -113,7 +119,8 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
             false,
             $objectName,
             $version->attribute( 'initial_language' )->attribute( 'locale' ),
-            false
+            false,
+            $httpImageAltText
         );
         if ( !$uploadedOk )
         {
@@ -122,6 +129,7 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
 
         $uploadVersion = $uploadedOk['contentobject']->currentVersion();
         $newObjectID = (int)$uploadedOk['contentobject']->attribute( 'id' );
+        $imageAltText = '';
 
         foreach ( $uploadVersion->dataMap() as $key => $attr )
         {

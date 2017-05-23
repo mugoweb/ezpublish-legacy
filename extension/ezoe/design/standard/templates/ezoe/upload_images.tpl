@@ -64,6 +64,7 @@ eZOEPopupUtils.settings.browseClassGenerator = function( n, hasImage ){
                 {include uri="design:ezoe/upload/common_attributes.tpl" objectname_input_name='ContentObjectAttribute_name' file_name_attribute='accept="image/*"'}
 
                 <!-- Next two attributes are image specific  -->
+
                 <tr>
                     <td class="column1"><label id="alttextlabel" for="objectAltText">{'Alternative text'|i18n('design/standard/ezoe')}</label></td>
                     <td colspan="2"><input id="objectAltText" name="ContentObjectAttribute_image" size="53" type="text" value="" title="{'Alternative text for the image, lets internet clients know what kind of image this is without dowloading it or actually seeing it.'|i18n('design/standard/ezoe/wai')}" /></td>
