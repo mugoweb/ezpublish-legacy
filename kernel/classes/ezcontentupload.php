@@ -466,7 +466,7 @@ class eZContentUpload
      *
      * @return boolean
      */
-    function handleUpload( &$result, $httpFileIdentifier, $location, $existingNode, $nameString = '', $localeCode = false, $publish = true, $httpImageAltText='' )
+    function handleUpload( &$result, $httpFileIdentifier, $location, $existingNode, $nameString = '', $localeCode = false, $publish = true )
     {
         $result = array( 'errors' => array(),
                          'notices' => array(),
@@ -584,7 +584,6 @@ class eZContentUpload
         if ( $classIdentifier == 'image' )
         {
             $classAttribute = $dataMap['image'];
-
             $maxSize = 1024 * 1024 * $classAttribute->attribute( 'data_int1' );
             if ( $maxSize != 0 && $file->attribute( 'filesize' ) > $maxSize )
             {
