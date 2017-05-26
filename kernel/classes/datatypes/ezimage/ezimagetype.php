@@ -239,26 +239,6 @@ class eZImageType extends eZDataType
                 $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid image file is required.' ) );
                 return eZInputValidator::STATE_INVALID;
             }
-
-            if( !self::validateRequiredImageAltText( $httpRequiredImageAltTextName, $http, $contentObjectAttribute ) )
-            {
-                $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'Alternate text is required for this image.' ) );
-                return eZInputValidator::STATE_INVALID;
-            }
-        }
-        else
-        {
-            // Throw error message if there is an image without alternative text when alt text is required.
-            $data_text  = simplexml_load_string( $contentObjectAttribute->attribute('data_text') );
-            $attributes = $data_text->attributes();
-            if( $attributes[ 'filename' ] != '' )
-            {
-                if( !self::validateRequiredImageAltText( $httpRequiredImageAltTextName, $http, $contentObjectAttribute ) )
-                {
-                    $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'Alternate text is required for this image.' ) );
-                    return eZInputValidator::STATE_INVALID;
-                }
-            }
         }
 
         if ( $mustUpload && $canFetchResult == eZHTTPFile::UPLOADEDFILE_DOES_NOT_EXIST )
@@ -279,6 +259,27 @@ class eZImageType extends eZDataType
                 'The size of the uploaded file exceeds the limit set for this site: %1 bytes.' ), $maxSize );
             return eZInputValidator::STATE_INVALID;
         }
+
+        // Check for a valid alternative text if there is an image and
+        // if the alt text is required
+        if(
+            $contentObjectAttribute->attribute( 'has_content' ) &&
+            $contentObjectAttribute->contentClassAttribute()->DataInt2 != 0
+        )
+        {
+            $altTextValid =
+                $http->hasPostVariable( $httpRequiredImageAltTextName ) &&
+                self::validateImageAltText(
+                    $http->postVariable( $httpRequiredImageAltTextName )
+                );
+
+            if( !$altTextValid )
+            {
+                $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'Alternate text is required for this image.' ) );
+                return eZInputValidator::STATE_INVALID;
+            }
+        }
+
         return eZInputValidator::STATE_ACCEPTED;
     }
 
@@ -291,38 +292,17 @@ class eZImageType extends eZDataType
         return in_array( $imageType, $ini->variable( 'ValidUploadFormats', 'MIMEList' ) );
     }
 
-    private static function validateRequiredImageAltText( $httpRequiredImageAltTextName, $http, $contentObjectAttribute )
-    {
-        // Does class require alternative text?
-        if( $contentObjectAttribute->contentClassAttribute()->DataInt2 != 0 )
-        {
-            if( $http->hasPostVariable( $httpRequiredImageAltTextName ) )
-            {
-                $imageAltText = $http->postVariable( $httpRequiredImageAltTextName );
-
-                if( self::validateImageAltText( $imageAltText ) )
-                {
-                    return true;
-                }
-            }
-        }
-        else
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    // Public function called from this class and eZContentUpload::handleUpload [ kernel/classes/ezcontentupload.php ]
+    /**
+     * @example eZContentUpload::handleUpload [ kernel/classes/ezcontentupload.php ]
+     * @param string $imageAltText
+     * @return bool
+     */
     public static function validateImageAltText(  $imageAltText )
     {
         // This is a pretty lean check for alt text, merely checking for a string of any length
         // Consider expanding later to include warnings for insufficient alternative text
         // such as matching filename, containing underscores, etc.
-        if( $imageAltText == '' )
-            return false;
-        return true;
+        return trim( $imageAltText ) != '';
     }
 
     /**
