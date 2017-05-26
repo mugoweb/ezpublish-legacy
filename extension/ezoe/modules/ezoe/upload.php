@@ -104,12 +104,6 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
         $objectName = trim( $http->postVariable( 'objectName' ) );
     }
 
-    $httpImageAltText = '';
-    if ( $http->hasPostVariable( 'ContentObjectAttribute_image' ) )
-    {
-        $httpImageAltText = trim( $http->postVariable( 'ContentObjectAttribute_image' ) );
-    }
-
     try
     {
         $uploadedOk = $upload->handleUpload(
@@ -119,8 +113,7 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
             false,
             $objectName,
             $version->attribute( 'initial_language' )->attribute( 'locale' ),
-            false,
-            $httpImageAltText
+            false
         );
         if ( !$uploadedOk )
         {
@@ -136,58 +129,68 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
             //post pattern: ContentObjectAttribute_attribute-identifier
             $base = 'ContentObjectAttribute_'. $key;
             $postVar = trim( $http->postVariable( $base, '' ) );
-            if ( $postVar !== '' )
+            switch ( $attr->attribute( 'data_type_string' ) )
             {
-                switch ( $attr->attribute( 'data_type_string' ) )
-                {
-                    case 'ezstring':
-                        $classAttr = $attr->attribute( 'contentclass_attribute' );
-                        $dataType = $classAttr->attribute( 'data_type' );
-                        if ( $dataType->validateStringHTTPInput( $postVar, $attr, $classAttr ) !== eZInputValidator::STATE_ACCEPTED )
-                        {
-                            throw new InvalidArgumentException( $attr->validationError() );
-                        }
-                    case 'eztext':
-                    case 'ezkeyword':
-                        $attr->fromString( $postVar );
-                        $attr->store();
-                        break;
-                    case 'ezfloat':
-                        $floatValue = (float)str_replace( ',', '.', $postVar );
-                        $classAttr = $attr->attribute( 'contentclass_attribute' );
-                        $dataType = $classAttr->attribute( 'data_type' );
-                        if ( $dataType->validateFloatHTTPInput( $floatValue, $attr, $classAttr ) !== eZInputValidator::STATE_ACCEPTED )
-                        {
-                            throw new InvalidArgumentException( $attr->validationError() );
-                        }
-                        $attr->setAttribute( 'data_float', $floatValue );
-                        $attr->store();
-                        break;
-                    case 'ezinteger':
-                        $classAttr = $attr->attribute( 'contentclass_attribute' );
-                        $dataType = $classAttr->attribute( 'data_type' );
-                        if ( $dataType->validateIntegerHTTPInput( $postVar, $attr, $classAttr ) !== eZInputValidator::STATE_ACCEPTED )
-                        {
-                            throw new InvalidArgumentException( $attr->validationError() );
-                        }
-                    case 'ezboolean':
-                        $attr->setAttribute( 'data_int', (int)$postVar );
-                        $attr->store();
-                        break;
-                    case 'ezimage':
-                        // validation has been done by eZContentUpload
-                        $content = $attr->attribute( 'content' );
-                        $content->setAttribute( 'alternative_text', $postVar );
+                case 'ezstring':
+                    $classAttr = $attr->attribute( 'contentclass_attribute' );
+                    $dataType = $classAttr->attribute( 'data_type' );
+                    if ( $dataType->validateStringHTTPInput( $postVar, $attr, $classAttr ) !== eZInputValidator::STATE_ACCEPTED )
+                    {
+                        throw new InvalidArgumentException( $attr->validationError() );
+                    }
+                case 'eztext':
+                case 'ezkeyword':
+                    $attr->fromString( $postVar );
+                    $attr->store();
+                    break;
+                case 'ezfloat':
+                    $floatValue = (float)str_replace( ',', '.', $postVar );
+                    $classAttr = $attr->attribute( 'contentclass_attribute' );
+                    $dataType = $classAttr->attribute( 'data_type' );
+                    if ( $dataType->validateFloatHTTPInput( $floatValue, $attr, $classAttr ) !== eZInputValidator::STATE_ACCEPTED )
+                    {
+                        throw new InvalidArgumentException( $attr->validationError() );
+                    }
+                    $attr->setAttribute( 'data_float', $floatValue );
+                    $attr->store();
+                    break;
+                case 'ezinteger':
+                    $classAttr = $attr->attribute( 'contentclass_attribute' );
+                    $dataType = $classAttr->attribute( 'data_type' );
+                    if ( $dataType->validateIntegerHTTPInput( $postVar, $attr, $classAttr ) !== eZInputValidator::STATE_ACCEPTED )
+                    {
+                        throw new InvalidArgumentException( $attr->validationError() );
+                    }
+                case 'ezboolean':
+                    $attr->setAttribute( 'data_int', (int)$postVar );
+                    $attr->store();
+                    break;
+                case 'ezimage':
+                    $content = $attr->attribute( 'content' );
+
+                    // Check if the alt text is required
+                    if(
+                        !trim( $postVar ) &&
+                        eZImageType::isAltTextRequired( $attr )
+                    )
+                    {
+                        throw new InvalidArgumentException(
+                            ezpI18n::tr( 'design/standard/error/kernel','Alternative text required.' )
+                        );
+                    }
+                    else
+                    {
+                        $content->setAttribute( 'alternative_text', trim( $postVar ) );
                         $content->store( $attr );
-                        break;
-                    case 'ezxmltext':
-                        $parser = new eZOEInputParser();
-                        $document = $parser->process( $postVar );
-                        $xmlString = eZXMLTextType::domString( $document );
-                        $attr->setAttribute( 'data_text', $xmlString );
-                        $attr->store();
-                        break;
-                }
+                    }
+                    break;
+                case 'ezxmltext':
+                    $parser = new eZOEInputParser();
+                    $document = $parser->process( $postVar );
+                    $xmlString = eZXMLTextType::domString( $document );
+                    $attr->setAttribute( 'data_text', $xmlString );
+                    $attr->store();
+                    break;
             }
         }
 

@@ -264,7 +264,7 @@ class eZImageType extends eZDataType
         // if the alt text is required
         if(
             $contentObjectAttribute->attribute( 'has_content' ) &&
-            $contentObjectAttribute->contentClassAttribute()->DataInt2 != 0
+			self::isAltTextRequired( $contentObjectAttribute )
         )
         {
             $altTextValid =
@@ -297,12 +297,21 @@ class eZImageType extends eZDataType
      * @param string $imageAltText
      * @return bool
      */
-    public static function validateImageAltText(  $imageAltText )
+    public static function validateImageAltText( $imageAltText )
     {
         // This is a pretty lean check for alt text, merely checking for a string of any length
         // Consider expanding later to include warnings for insufficient alternative text
         // such as matching filename, containing underscores, etc.
         return trim( $imageAltText ) != '';
+    }
+
+	/**
+	 * @param eZContentObjectAttribute $contentObjectAttribute
+	 * @return bool
+	 */
+    public static function isAltTextRequired( eZContentObjectAttribute $contentObjectAttribute )
+    {
+        return $contentObjectAttribute->contentClassAttribute()->DataInt2 != 0;
     }
 
     /**
@@ -400,7 +409,7 @@ class eZImageType extends eZDataType
         $result = array( 'errors' => array(),
                          'require_storage' => false );
 
-        $handler = $objectAttribute->content();
+        $handler = $objectAttribute->content(); /** @var $handler eZImageAliasHandler */
         if ( !$handler )
         {
             $result['errors'][] = array( 'description' => ezpI18n::tr( 'kernel/classes/datatypes/ezimage',
