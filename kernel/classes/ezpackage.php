@@ -1142,7 +1142,7 @@ class eZPackage
             catch( Exception $e )
             {
                 eZDebug::writeError( "Failed loading temporary package $packageName" );
-				return false;
+                return false;
             }
 
             $definitionFileName = eZDir::path( array( $archivePath, self::definitionFilename() ) );
