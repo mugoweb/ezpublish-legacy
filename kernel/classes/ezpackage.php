@@ -1136,12 +1136,13 @@ class eZPackage
                     copy( $archiveName, $tmpFile );
                 }
 
-                $phar = new PharData( $tmpFile, FilesystemIterator::SKIP_DOTS, 'pharPackage', Phar::GZ );
+                $phar = new PharData( $tmpFile );
                 $phar->extractTo( $archivePath, $fileList, true );
             }
             catch( Exception $e )
             {
                 eZDebug::writeError( "Failed loading temporary package $packageName" );
+				return false;
             }
 
             $definitionFileName = eZDir::path( array( $archivePath, self::definitionFilename() ) );
