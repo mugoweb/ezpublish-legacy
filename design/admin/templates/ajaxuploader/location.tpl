@@ -3,6 +3,21 @@
     <fieldset>
         <legend>{"Step 2/3: Choose a location for the new '%class' object"|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}</legend>
         <p>{'<em>%file</em> has successfully been uploaded.'|i18n( 'design/admin/ajaxupload', '', hash( '%file', $file.original_filename|wash() ) )}</p>
+        {if $class.identifier|eq( 'image' )}
+            {def $class = fetch( 'content', 'class', hash( 'class_id', $class.id ) )}
+            {def $alt_text_required = ''}
+            {foreach $class.data_map as $attribute}
+                {if $attribute.data_type_string|eq( 'ezimage' )}
+                    {if $attribute.data_int2}
+                        {set $alt_text_required = '(required)'}
+                    {/if}
+                {/if}
+            {/foreach}
+            <p>
+                <label for="alt_text_entry">Alternative text{$alt_text_required}:</label>
+                <input{if $alt_text_required} required class="input-required"{/if} id="UploadAlternativeText" name="UploadAlternativeText" size="70" maxlength="150">
+            </p>
+        {/if}
         <p>{"Please choose a location for the '%class' object that is going to be created from it."|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}</p>
         <div class="ajaxuploader-browse">
             {include uri="design:ajaxuploader/browse.tpl" browse_start=$browse_start class=$class browse=$browse default_parent_node=$default_parent_node}

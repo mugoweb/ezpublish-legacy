@@ -403,13 +403,11 @@ if ( $contentClassHasInput )
         if ( $http->hasPostVariable( $canTranslateVariable ) )
             $canTranslateCheckedArray = $http->postVariable( $canTranslateVariable );
 
-
         if ( $http->hasPostVariable( 'ContentAttribute_priority' ) )
             $placementArray = $http->postVariable( 'ContentAttribute_priority' );
 
         if ( $http->hasPostVariable( 'ContentAttribute_category_select' ) )
             $categoryArray = $http->postVariable( 'ContentAttribute_category_select' );
-
 
         foreach ( $attributes as $attribute )
         {
@@ -417,7 +415,6 @@ if ( $contentClassHasInput )
             $attribute->setAttribute( 'is_required', in_array( $attributeID, $requireCheckedArray ) );
             $attribute->setAttribute( 'is_searchable', in_array( $attributeID, $searchableCheckedArray ) );
             $attribute->setAttribute( 'is_information_collector', in_array( $attributeID, $informationCollectorCheckedArray ) );
-
             // Set can_translate to 0 if user has clicked Disable translation in GUI
             $attribute->setAttribute( 'can_translate', !in_array( $attributeID, $canTranslateCheckedArray ) && $attribute->dataType()->isTranslatable() );
             // check if the category is set for this attribute key, may not be the case when using old admin and new attributes
@@ -426,16 +423,6 @@ if ( $contentClassHasInput )
             if ( isset( $categoryArray[$attributeID] ) )
             {
                 $attribute->setAttribute( 'category', $categoryArray[$attributeID] );
-            }
-
-            // For ezimage datatype only.  Check and set image alternative text required checkbox.
-            if( $attribute->attribute( 'data_type_string' ) == 'ezimage' )
-            {
-                $altTextRequiredVariable = 'ContentAttribute_alttextrequired_checked';
-                $altTextRequiredArray    = array();
-                if ( $http->hasPostVariable( $altTextRequiredVariable ) )
-                    $altTextRequiredArray = $http->postVariable( $altTextRequiredVariable );
-                $attribute->setAttribute( 'data_int2', in_array( $attributeID, $altTextRequiredArray ) );
             }
         }
     }

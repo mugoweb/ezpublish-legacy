@@ -262,16 +262,16 @@ class eZImageType extends eZDataType
 
         // Check for a valid alternative text if there is an image and
         // if the alt text is required
-        if(
-            $contentObjectAttribute->attribute( 'has_content' ) &&
-			self::isAltTextRequired( $contentObjectAttribute )
-        )
+        if(    $contentObjectAttribute->attribute( 'has_content' ) && self::isAltTextRequired( $contentObjectAttribute ) )
         {
-            $altTextValid =
-                $http->hasPostVariable( $httpRequiredImageAltTextName ) &&
-                self::validateImageAltText(
-                    $http->postVariable( $httpRequiredImageAltTextName )
-                );
+            $altTextValid = false;
+            if( $http->hasPostVariable( $httpRequiredImageAltTextName ) )
+            {
+                if( self::validateImageAltText( $http->postVariable( $httpRequiredImageAltTextName ) ) )
+                {
+                    $altTextValid = true;
+                }
+            }
 
             if( !$altTextValid )
             {
@@ -326,14 +326,6 @@ class eZImageType extends eZDataType
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $result = false;
-        $imageAltText = false;
-        $hasImageAltText = false;
-
-        if ( $http->hasPostVariable( $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" ) ) )
-        {
-            $imageAltText = $http->postVariable( $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" ) );
-            $hasImageAltText = true;
-        }
 
         $content = $contentObjectAttribute->attribute( 'content' );
         $httpFileName = $base . "_data_imagename_" . $contentObjectAttribute->attribute( "id" );
@@ -350,13 +342,6 @@ class eZImageType extends eZDataType
                 }
             }
 
-        }
-
-        if ( $content )
-        {
-            if ( $hasImageAltText )
-                $content->setAttribute( 'alternative_text', $imageAltText );
-            $result = true;
         }
 
         return $result;
@@ -514,25 +499,37 @@ class eZImageType extends eZDataType
 
     function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
-        $rtn = false;
+        $sizeAllowedChanged      = false;
+        $altRequiredChanged      = false;
 
-        /*
-        if ( $http->hasPostVariable( self::ALTTEXTREQUIRED_VARIABLE ) )
+        if( $http->hasPostVariable( 'ContentClassHasInput' ) )
         {
-            $requiredCheckedArray = $http->postVariable( self::ALTTEXTREQUIRED_VARIABLE );
-            $rtn = true;
-            $classAttribute->setAttribute( self::ALTTEXTREQUIRED_FIELD, $requiredCheckedArray );
+            if( $http->hasPostVariable( self::ALTTEXTREQUIRED_VARIABLE ) )
+            {
+                if( array_key_exists( $classAttribute->attribute( 'id' ), $http->postVariable( self::ALTTEXTREQUIRED_VARIABLE ) ) )
+                {
+                    $classAttribute->setAttribute( self::ALTTEXTREQUIRED_FIELD, 1 );
+                }
+                else
+                {
+                    $classAttribute->setAttribute( self::ALTTEXTREQUIRED_FIELD, 0 );
+                }
+                $altRequiredChanged = true;
+            }
+            else
+            {
+                $classAttribute->setAttribute( self::ALTTEXTREQUIRED_FIELD, 0 );
+            }
         }
-        */
 
-        $filesizeName = $base . self::FILESIZE_VARIABLE . $classAttribute->attribute( 'id' );
-        if ( $http->hasPostVariable( $filesizeName ) )
+        $fileSizeAllowedVariableName = $base . self::FILESIZE_VARIABLE . $classAttribute->attribute( 'id' );
+        if ( $http->hasPostVariable( $fileSizeAllowedVariableName ) )
         {
-            $filesizeValue = $http->postVariable( $filesizeName );
-            $classAttribute->setAttribute( self::FILESIZE_FIELD, $filesizeValue );
-            $rtn = true;
+            $classAttribute->setAttribute( self::FILESIZE_FIELD, $http->postVariable( $fileSizeAllowedVariableName ) );
+            $sizeAllowedChanged = true;
         }
-        return $rtn;
+
+        return ( $sizeAllowedChanged || $altRequiredChanged );
     }
 
     function customObjectAttributeHTTPAction( $http, $action, $contentObjectAttribute, $parameters )
