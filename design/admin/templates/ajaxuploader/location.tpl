@@ -4,12 +4,11 @@
         <legend>{"Step 2/3: Choose a location for the new '%class' object"|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}</legend>
         <p>{'<em>%file</em> has successfully been uploaded.'|i18n( 'design/admin/ajaxupload', '', hash( '%file', $file.original_filename|wash() ) )}</p>
         {if $class.identifier|eq( 'image' )}
-            {def $class = fetch( 'content', 'class', hash( 'class_id', $class.id ) )}
             {def $alt_text_required = ''}
             {foreach $class.data_map as $attribute}
                 {if $attribute.data_type_string|eq( 'ezimage' )}
                     {if $attribute.data_int2}
-                        {set $alt_text_required = '(required)'}
+                        {set $alt_text_required = ' (required)'}
                     {/if}
                 {/if}
             {/foreach}

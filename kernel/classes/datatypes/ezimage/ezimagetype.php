@@ -206,7 +206,6 @@ class eZImageType extends eZDataType
      */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
-
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
         $httpFileName = $base . "_data_imagename_" . $contentObjectAttribute->attribute( "id" );
         $httpRequiredImageAltTextName = $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" );
@@ -360,7 +359,6 @@ class eZImageType extends eZDataType
 
                 $imageHandler->initializeFromHTTPFile( $httpFile, $imageAltText );
             }
-
             if ( $imageHandler->isStorageRequired() )
             {
                 $imageHandler->store( $contentObjectAttribute );
