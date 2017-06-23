@@ -70,25 +70,25 @@ $GLOBALS["eZRequestError"] = true;
 
                 if( !empty( $headers ) )
                 {
-					foreach( $headers as $name => $value )
-					{
-						// store header on $Result to get it into the content cache
-						$Result['responseHeaders'][] = $name . ': '. $value;
+                    foreach( $headers as $name => $value )
+                    {
+                        // store header on $Result to get it into the content cache
+                        $Result['responseHeaders'][] = $name . ': '. $value;
 
-						// Copy 'Status' header to a protocol header
-						// TODO: should use http_response_code()
-						if( $name == 'Status' )
-						{
-							$Result['responseHeaders'][] =
-								eZSys::serverVariable( 'SERVER_PROTOCOL' ) . " $httpErrorCode $value";
-						}
-					}
+                        // Copy 'Status' header to a protocol header
+                        // TODO: should use http_response_code()
+                        if( $name == 'Status' )
+                        {
+                            $Result['responseHeaders'][] =
+                                eZSys::serverVariable( 'SERVER_PROTOCOL' ) . " $httpErrorCode $value";
+                        }
+                    }
 
-					// apply header
-					foreach( $Result['responseHeaders'] as $header )
-					{
-						header( $header );
-					}
+                    // apply header
+                    foreach( $Result['responseHeaders'] as $header )
+                    {
+                        header( $header );
+                    }
 
                     // This is triggered if the URL alias translator wants to redirect
                     // to another URL
@@ -211,18 +211,18 @@ $Result['errorNumber'] = $errorNumber;
  */
 function kernelErrorGetHeaderList( $errorINI, $httpErrorCode )
 {
-	$return = array();
+    $return = array();
 
-	if( $errorINI->hasVariable( 'HTTPError-' . $httpErrorCode, 'HeaderList' ) )
-	{
-		$return = $errorINI->variable( 'HTTPError-' . $httpErrorCode, 'HeaderList' );
-	}
+    if( $errorINI->hasVariable( 'HTTPError-' . $httpErrorCode, 'HeaderList' ) )
+    {
+        $return = $errorINI->variable( 'HTTPError-' . $httpErrorCode, 'HeaderList' );
+    }
 
-	// Make code backwards compatible - "HTTPName" is deprecated
-	if( $errorINI->hasVariable( 'HTTPError-' . $httpErrorCode, 'HTTPName' ) )
-	{
-		$return[ 'Status' ] = $errorINI->variable( 'HTTPError-' . $httpErrorCode, 'HTTPName' );
-	}
+    // Make code backwards compatible - "HTTPName" is deprecated
+    if( $errorINI->hasVariable( 'HTTPError-' . $httpErrorCode, 'HTTPName' ) )
+    {
+        $return[ 'Status' ] = $errorINI->variable( 'HTTPError-' . $httpErrorCode, 'HTTPName' );
+    }
 
-	return $return;
+    return $return;
 }
