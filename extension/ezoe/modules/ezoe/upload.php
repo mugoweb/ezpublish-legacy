@@ -144,10 +144,15 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
                             {
                                 throw new InvalidArgumentException( $attr->validationError() );
                             }
+                            else
+                            {
+                                $attr->fromString( $postVar );
+                                $attr->store();
+                            }
                         }
+                        break;
                     case 'eztext':
                     case 'ezkeyword':
-                        // Hard to read: this gets executed also for ezstring
                         $attr->fromString( $postVar );
                         $attr->store();
                         break;
@@ -178,8 +183,8 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
 
                         // Check if the alt text is required
                         if(
-                            !trim( $postVar ) &&
-                            eZImageType::isAltTextRequired( $attr )
+                            eZImageType::isAltTextRequired( $attr ) &&
+                            !trim( $postVar )
                         )
                         {
                             throw new InvalidArgumentException(
@@ -188,7 +193,7 @@ if ( $http->hasPostVariable( 'uploadButton' ) || $forcedUpload )
                         }
                         else
                         {
-                            $content->setAttribute( 'alternative_text', trim( $postVar ) );
+                            $content->setAttribute( 'alternative_text', $postVar );
                             $content->store( $attr );
                         }
                         break;

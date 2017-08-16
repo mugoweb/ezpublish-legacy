@@ -212,7 +212,7 @@ class eZImageType extends eZDataType
         $maxSize = 1024 * 1024 * $classAttribute->attribute( self::FILESIZE_FIELD );
         $mustUpload = false;
 
-        if( $contentObjectAttribute->validateIsRequired() )
+        if ( $contentObjectAttribute->validateIsRequired() )
         {
             $tmpImgObj = $contentObjectAttribute->attribute( 'content' );
             $original = $tmpImgObj->attribute( 'original' );
@@ -233,7 +233,7 @@ class eZImageType extends eZDataType
                 return eZInputValidator::STATE_INVALID;
             }
 
-            if( !self::validateImageFile( $imagefile ) )
+            if ( !self::validateImageFile( $imagefile ) )
             {
                 $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'A valid image file is required.' ) );
                 return eZInputValidator::STATE_INVALID;
@@ -261,18 +261,9 @@ class eZImageType extends eZDataType
 
         // Check for a valid alternative text if there is an image and
         // if the alt text is required
-        if(    $contentObjectAttribute->attribute( 'has_content' ) && self::isAltTextRequired( $contentObjectAttribute ) )
+        if ( $contentObjectAttribute->attribute( 'has_content' ) && self::isAltTextRequired( $contentObjectAttribute ) )
         {
-            $altTextValid = false;
-            if( $http->hasPostVariable( $httpRequiredImageAltTextName ) )
-            {
-                if( self::validateImageAltText( $http->postVariable( $httpRequiredImageAltTextName ) ) )
-                {
-                    $altTextValid = true;
-                }
-            }
-
-            if( !$altTextValid )
+            if ( !$http->hasPostVariable( $httpRequiredImageAltTextName ) || !self::validateImageAltText( $http->postVariable( $httpRequiredImageAltTextName ) ) )
             {
                 $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes', 'Alternate text is required for this image.' ) );
                 return eZInputValidator::STATE_INVALID;
@@ -310,7 +301,7 @@ class eZImageType extends eZDataType
 	 */
     public static function isAltTextRequired( eZContentObjectAttribute $contentObjectAttribute )
     {
-        return $contentObjectAttribute->contentClassAttribute()->DataInt2 != 0;
+        return $contentObjectAttribute->contentClassAttribute()->attribute( self::ALTTEXTREQUIRED_FIELD ) == 1;
     }
 
     /**
@@ -325,6 +316,13 @@ class eZImageType extends eZDataType
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $result = false;
+        $imageAltText = false;
+        $hasImageAltText = false;
+        if ( $http->hasPostVariable( $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" ) ) )
+        {
+            $imageAltText = $http->postVariable( $base . "_data_imagealttext_" . $contentObjectAttribute->attribute( "id" ) );
+            $hasImageAltText = true;
+        }
 
         $content = $contentObjectAttribute->attribute( 'content' );
         $httpFileName = $base . "_data_imagename_" . $contentObjectAttribute->attribute( "id" );
@@ -341,6 +339,13 @@ class eZImageType extends eZDataType
                 }
             }
 
+        }
+
+        if ( $content )
+        {
+            if ( $hasImageAltText )
+                $content->setAttribute( 'alternative_text', $imageAltText );
+            $result = true;
         }
 
         return $result;
@@ -500,11 +505,11 @@ class eZImageType extends eZDataType
         $sizeAllowedChanged      = false;
         $altRequiredChanged      = false;
 
-        if( $http->hasPostVariable( 'ContentClassHasInput' ) )
+        if ( $http->hasPostVariable( 'ContentClassHasInput' ) )
         {
-            if( $http->hasPostVariable( self::ALTTEXTREQUIRED_VARIABLE ) )
+            if ( $http->hasPostVariable( self::ALTTEXTREQUIRED_VARIABLE ) )
             {
-                if( array_key_exists( $classAttribute->attribute( 'id' ), $http->postVariable( self::ALTTEXTREQUIRED_VARIABLE ) ) )
+                if ( array_key_exists( $classAttribute->attribute( 'id' ), $http->postVariable( self::ALTTEXTREQUIRED_VARIABLE ) ) )
                 {
                     $classAttribute->setAttribute( self::ALTTEXTREQUIRED_FIELD, 1 );
                 }

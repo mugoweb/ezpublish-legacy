@@ -2,7 +2,7 @@
 {default attribute_base='ContentObjectAttribute'}
 {let attribute_content=$attribute.content}
 
-{def $alt_text_required = $attribute.contentclass_attribute.data_int2|ne( 0 )}
+{def $alt_text_required = $attribute.contentclass_attribute.data_int2|eq( 1 )}
 
 {* Current image. *}
 <div class="block">
