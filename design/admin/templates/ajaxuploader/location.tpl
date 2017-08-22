@@ -4,34 +4,27 @@
         {def
             $upload_class_map        = ezini( 'CreateSettings', 'MimeClassMap', 'upload.ini' )
             $upload_class_attribute  = ezini( concat( $upload_class_map['image'], '_ClassSettings' ), 'FileAttribute', 'upload.ini' )
-            $alt_text_instructions   = ''
+            $alt_text_required       = false()
         }
+
         {if $class.identifier|eq( $upload_class_map['image'] )}
-            {def
-                $alt_text_label          = ''
-                $alt_text_html_attribute = ''
-            }
+            {def $has_alternative_text = true()}
             {if $class.data_map[$upload_class_attribute].data_int2}
-                {set
-                    $alt_text_instructions   = " The alternative text field is required."|i18n( 'design/admin/ajaxuploader' )
-                    $alt_text_label          = " (required)"|i18n( 'design/admin/ajaxuploader' )
-                    $alt_text_html_attribute = ' required class="input-required"'
-                }
+                {set $alt_text_required = true()}
             {/if}
-            {set-block variable=$alt_text_field_set}
-                <p>
-                    <label for="alt_text_entry">Alternative text{$alt_text_label}:</label>
-                    <input{$alt_text_html_attribute} id="UploadAlternativeText" name="UploadAlternativeText" size="70">
-                </p>
-            {/set-block}
         {else}
-            {def $alt_text_field_set = ''}
+            {def $has_alternative_text = false()}
         {/if}
 
-        <legend>{"Step 2/3: Choose a location for the new '%class' object."|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}{$alt_text_instructions}</legend>
+        <legend>{"Step 2/3: Choose a location for the new '%class' object."|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}{if $alt_text_required} {'The alternative text field is required.'|i18n( 'design/admin/ajaxuploader' )}{/if}</legend>
         <p>{'<em>%file</em> has successfully been uploaded.'|i18n( 'design/admin/ajaxupload', '', hash( '%file', $file.original_filename|wash() ) )}</p>
 
-        {$alt_text_field_set}
+        {if $has_alternative_text}
+            <p>
+                <label for="alt_text_entry">{'Alternative text'|i18n( 'design/admin/ajaxuploader' )}{if $alt_text_required} {'(required)'|i18n( 'design/admin/ajaxuploader' )}{/if}:</label>
+                <input{if $alt_text_required} required class="input-required"{/if} id="UploadAlternativeText" name="UploadAlternativeText" size="70">
+            </p>
+        {/if}
 
         <p>{"Please choose a location for the '%class' object that is going to be created from it."|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}</p>
         <div class="ajaxuploader-browse">
