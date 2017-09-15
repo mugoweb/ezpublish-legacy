@@ -716,9 +716,19 @@ class eZContentOperationCollection
     }
 
     /**
-     * Moves a node
+     * Moves a node. A wrapper for eZContentObjectTreeNode's 'move' operation.
      *
-     * @param int $nodeID
+     * It does:
+     *  - clears caches for old placement;
+     *  - performs actual move( calls eZContentObjectTreeNode->move() );
+     *  - updates subtree path;
+     *  - updates node's section;
+     *  - updates assignment( setting new 'parent_node' );
+     *  - clears caches for new placement;
+     *  - fixes the reverse relations;
+     *  - updates the search index;
+     *
+     * @param int $nodeID The id of a node to move.
      * @param int $objectID
      * @param int $newParentNodeID
      *
@@ -726,7 +736,97 @@ class eZContentOperationCollection
      */
     static public function moveNode( $nodeID, $objectID, $newParentNodeID )
     {
-       if( !eZContentObjectTreeNodeOperations::move( $nodeID, $newParentNodeID ) )
+        $result = false;
+
+        if ( !is_numeric( $nodeID ) || !is_numeric( $newParentNodeID ) )
+            return false;
+
+        $node = eZContentObjectTreeNode::fetch( $nodeID );
+        if ( !$node )
+            return false;
+
+        $object = $node->object();
+        if ( !$object )
+            return false;
+
+        $oldParentNode = $node->fetchParent();
+        $oldParentObject = $oldParentNode->object();
+
+        // clear user policy cache if this is a user object
+        if ( in_array( $object->attribute( 'contentclass_id' ), eZUser::contentClassIDs() ) )
+        {
+            eZUser::purgeUserCacheByUserId( $object->attribute( 'id' ) );
+        }
+
+        // clear cache for old placement.
+        // If child count exceeds threshold, do nothing here, and instead clear all view cache at the end.
+        $childCountInThresholdRange = eZContentCache::inCleanupThresholdRange( $node->childrenCount( false ) );
+        if ( $childCountInThresholdRange )
+        {
+            eZContentCacheManager::clearContentCacheIfNeeded( $objectID );
+        }
+
+        $db = eZDB::instance();
+        $db->begin();
+
+        $node->move( $newParentNodeID );
+
+        $newNode = eZContentObjectTreeNode::fetchNode( $objectID, $newParentNodeID );
+
+        if ( $newNode )
+        {
+            $newNode->updateSubTreePath( true, true );
+            if ( $newNode->attribute( 'main_node_id' ) == $newNode->attribute( 'node_id' ) )
+            {
+                // If the main node is moved we need to check if the section ID must change
+                $newParentNode = $newNode->fetchParent();
+                $newParentObject = $newParentNode->object();
+                if ( $object->attribute( 'section_id' ) != $newParentObject->attribute( 'section_id' ) )
+                {
+
+                    eZContentObjectTreeNode::assignSectionToSubTree( $newNode->attribute( 'main_node_id' ),
+                                                                     $newParentObject->attribute( 'section_id' ),
+                                                                     $oldParentObject->attribute( 'section_id' ) );
+                }
+            }
+
+            // modify assignment
+            $curVersion     = $object->attribute( 'current_version' );
+            $nodeAssignment = eZNodeAssignment::fetch( $objectID, $curVersion, $oldParentNode->attribute( 'node_id' ) );
+
+            if ( $nodeAssignment )
+            {
+                $nodeAssignment->setAttribute( 'parent_node', $newParentNodeID );
+                $nodeAssignment->setAttribute( 'op_code', eZNodeAssignment::OP_CODE_MOVE );
+                $nodeAssignment->store();
+
+                // update search index specifying we are doing a move operation
+                $nodeIDList = array( $nodeID );
+                eZSearch::removeNodeAssignment( $node->attribute( 'main_node_id' ), $newNode->attribute( 'main_node_id' ), $object->attribute( 'id' ), $nodeIDList );
+                eZSearch::addNodeAssignment( $newNode->attribute( 'main_node_id' ), $object->attribute( 'id' ), $nodeIDList, true );
+            }
+
+            $result = true;
+        }
+        else
+        {
+            eZDebug::writeError( "Node $nodeID was moved to $newParentNodeID but fetching the new node failed" );
+        }
+
+        $db->commit();
+
+        // clear cache for new placement.
+        // If child count exceeds threshold, clear all view cache instead.
+        if ( $childCountInThresholdRange )
+        {
+            eZContentCacheManager::clearContentCacheIfNeeded( $objectID );
+        }
+        else
+        {
+            eZContentCacheManager::clearAllContentCache();
+        }
+
+       if( !$result )
        {
            eZDebug::writeError( "Failed to move node $nodeID as child of parent node $newParentNodeID",
                                 __METHOD__ );
