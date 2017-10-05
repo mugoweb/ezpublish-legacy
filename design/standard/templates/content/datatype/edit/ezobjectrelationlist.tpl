@@ -239,7 +239,6 @@
                         <legend>{'Edit <%object_name> [%object_class]'|i18n( 'design/standard/content/datatype',, hash( '%object_name', $object.name, '%object_class', $object.class_name ) )|wash}</legend>
 
                         {foreach $version.contentobject_attributes as $Attribute}
-                        {section name=Attribute loop=$version.contentobject_attributes}
                             <div class="block">
                             {if $Attribute.display_info.edit.grouped_input}
                                 <fieldset>
