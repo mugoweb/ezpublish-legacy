@@ -259,9 +259,9 @@ class eZImageType extends eZDataType
             return eZInputValidator::STATE_INVALID;
         }
 
-        // Check for a valid alternative text if there is an image and
+        // Check for a valid alternative text if there is a valid image and
         // if the alt text is required
-        if ( $contentObjectAttribute->attribute( 'has_content' ) && self::isAltTextRequired( $contentObjectAttribute ) )
+        if ( $canFetchResult == eZHTTPFile::UPLOADEDFILE_OK && self::isAltTextRequired( $contentObjectAttribute ) )
         {
             if ( !$http->hasPostVariable( $httpRequiredImageAltTextName ) || !self::validateImageAltText( $http->postVariable( $httpRequiredImageAltTextName ) ) )
             {
