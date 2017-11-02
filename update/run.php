@@ -6,9 +6,12 @@
  *   php update/run.php -u root -h localhost -d ezp
  *
  */
-$dbUpdater = new MugoDbUpdater();
 
-$success = $dbUpdater->initConnection();
+$options = MugoDbUpdater::readCommandLineOptions();
+
+$dbUpdater = MugoDbUpdater::factory( $options );
+
+$success = $dbUpdater->initConnection( $options );
 
 if( $success )
 {
@@ -64,10 +67,8 @@ class MugoDbUpdater
 {
     protected $connection;
 
-    public function initConnection()
+    public function initConnection( $dbOptions )
     {
-        $dbOptions = $this->getOptions();
-
         if( $dbOptions[ 'dbname' ] )
         {
             $mysqli = new mysqli(
@@ -99,26 +100,6 @@ class MugoDbUpdater
     public function closeConnection()
     {
         $this->connection->close();
-    }
-
-    public function getOptions()
-    {
-        $dbOptions = array();
-
-        $options = getopt( 'h:u:p:d:' );
-        $dbOptions[ 'host' ] = $options[ 'h' ] ?: 'localhost';
-
-        $dbOptions[ 'user' ] = $options[ 'u' ];
-        if( !$dbOptions[ 'user' ] )
-        {
-            $processUser = posix_getpwuid( posix_geteuid() );
-            $dbOptions[ 'user' ] = $processUser[ 'name' ];
-        }
-
-        $dbOptions[ 'pass' ] = isset( $options[ 'p' ] ) ? $options[ 'p' ] : '';
-        $dbOptions[ 'dbname' ] = isset( $options[ 'd' ] ) ? $options[ 'd' ] : '';
-
-        return $dbOptions;
     }
 
     public function getDbSchemaVersion()
@@ -415,4 +396,63 @@ class MugoDbUpdater
 
         return $output;
     }
+
+    public static function readCommandLineOptions()
+    {
+        $dbOptions = array();
+
+        $options = getopt( 'h:u:p:d:' );
+        $dbOptions[ 'host' ] = isset( $options[ 'h' ] ) ? $options[ 'h' ] : 'localhost';
+        $dbOptions[ 'pass' ] = isset( $options[ 'p' ] ) ? $options[ 'p' ] : '';
+        $dbOptions[ 'dbname' ] = isset( $options[ 'd' ] ) ? $options[ 'd' ] : '';
+        $dbOptions[ 'dbtype' ] = isset( $options[ 't' ] ) ? $options[ 't' ] : 'mysql';
+
+        $dbOptions[ 'user' ] = $options[ 'u' ];
+        if( !$dbOptions[ 'user' ] )
+        {
+            $processUser = posix_getpwuid( posix_geteuid() );
+            $dbOptions[ 'user' ] = $processUser[ 'name' ];
+        }
+
+
+        return $dbOptions;
+    }
+
+    public static function factory( $parameters )
+    {
+        if( $parameters[ 'dbtype' ] == 'postgresql' )
+        {
+            return new MugoDbUpdaterPostgresql();
+        }
+        else
+        {
+            return new MugoDbUpdater();
+        }
+    }
+}
+
+/**
+ * This is only a stub class, you would need to implement a few functions
+ * in order to support PostgreSQL support
+ *
+ * Class MugoDbUpdaterPostgresql
+ */
+class MugoDbUpdaterPostgresql extends MugoDbUpdater
+{
+    public function initConnection( $dbOptions )
+    {
+        if( $dbOptions[ 'dbname' ] )
+        {
+            $this->connection = pg_connect( 'host='. $dbOptions[ 'host' ] .' port=5432 dbname='. $dbOptions[ 'dbname' ] .' user='. $dbOptions[ 'user' ] .' password=' . $dbOptions[ 'pass' ] );
+        }
+        else
+        {
+            echo 'Missing DB name parameter "d".' . "\n";
+            echo "\n";
+        }
+
+        return false;
+    }
+
+    // ...
 }
