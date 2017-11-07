@@ -32,7 +32,7 @@ if( $success )
                     if( !empty( $sqlQueries ) )
                     {
                         $dbUpdater->log( ' - Executing DB schema updates' );
-                        $dbUpdater->executeSqlQueries( $sqlQueries, $schemaVersion );
+                        $schemaVersion = $dbUpdater->executeSqlQueries( $sqlQueries, $schemaVersion );
                     }
                     else
                     {
@@ -184,7 +184,7 @@ class MugoDbUpdater
     /**
      * @param $sqlQueries
      * @param $schemaVersion
-     * @return boolean
+     * @return integer
      */
     public function executeSqlQueries( $sqlQueries, $schemaVersion )
     {
@@ -227,7 +227,7 @@ class MugoDbUpdater
             $this->connection->rollback();
         }
 
-        return $allQueriesOK;
+        return $schemaVersion;
     }
 
     /*
