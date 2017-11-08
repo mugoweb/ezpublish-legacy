@@ -6,12 +6,12 @@
             $upload_class_attribute  = ezini( concat( $upload_class_map['image'], '_ClassSettings' ), 'FileAttribute', 'upload.ini' )
         }
 
-        <legend>{"Step 2/3: Choose a location for the new '%class' object."|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}{if $alt_text_required} {'The alternative text field is required.'|i18n( 'design/admin/ajaxuploader' )}{/if}</legend>
+        <legend>{"Step 2/3: Choose a location for the new '%class' object."|i18n( 'design/admin/ajaxuploader', '', hash( '%class', $class.name|wash() ) )}{if $class.data_map[ $upload_class_attribute ].data_int2} {'The alternative text field is required.'|i18n( 'design/admin/ajaxuploader' )}{/if}</legend>
         <p>{'<em>%file</em> has successfully been uploaded.'|i18n( 'design/admin/ajaxupload', '', hash( '%file', $file.original_filename|wash() ) )}</p>
 
-        {if $upload_class_map[ $class.identifier ]|eq( 'image' )}
+        {if $class.identifier|eq( $upload_class_map['image'] )}
             <p>
-                <label for="alt_text_entry">{'Alternative text'|i18n( 'design/admin/ajaxuploader' )}{if $alt_text_required} {'(required)'|i18n( 'design/admin/ajaxuploader' )}{/if}:</label>
+                <label for="alt_text_entry">{'Alternative text'|i18n( 'design/admin/ajaxuploader' )}{if $class.data_map[ $upload_class_attribute ].data_int2} {'(required)'|i18n( 'design/admin/ajaxuploader' )}{/if}:</label>
                 <input{if $class.data_map[ $upload_class_attribute ].data_int2} required class="input-required"{/if} id="UploadAlternativeText" name="UploadAlternativeText" size="70">
             </p>
         {/if}
