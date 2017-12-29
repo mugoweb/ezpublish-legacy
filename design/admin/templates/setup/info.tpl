@@ -24,8 +24,24 @@
     </div>
 
     <div class="block">
-        <label>{'Version'|i18n( 'design/admin/setup/info', 'eZ Publish version' )}:</label>
+        <label>{'Code version'|i18n( 'design/admin/setup/info', 'eZ Publish version' )}:</label>
         {$ezpublish_version}
+    </div>
+    <div class="block">
+        <label>{'Edition'|i18n( 'design/admin/setup/info', 'eZ Publish edition' )}:</label>
+        {$ezpublish_edition}
+    </div>
+    <div class="block">
+        <label>{'Database version'|i18n( 'design/admin/setup/info' )}:</label>
+        {$ezpublish_db_version}
+    </div>
+    <div class="block">
+        <label>{'Database version release'|i18n( 'design/admin/setup/info' )}:</label>
+        {$ezpublish_db_version_release}
+    </div>
+    <div class="block">
+        <label>{'Database schema version'|i18n( 'design/admin/setup/info' )}:</label>
+        {$ezpublish_schema_version}
     </div>
 
     <div class="block">
