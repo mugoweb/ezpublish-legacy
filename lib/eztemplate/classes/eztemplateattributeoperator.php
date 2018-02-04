@@ -11,42 +11,24 @@
 /*!
   \class eZTemplateAttributeOperator eztemplateattributeoperator.php
   \ingroup eZTemplateOperators
-  \brief Display of variable attributes using operator "attribute" or dumps a variable using the operator "dump"
+  \brief Display of variable attributes using operator "dump"
 
   This class allows for displaying template variable attributes. The display
   is recursive and the number of levels can be maximized.
 
-  The "attribute" operator can take three parameters. The first is whether to show
-  variable values or not, default is to not show. The second is the maximum number
-  of levels to recurse, if blank or omitted the maxium level is 2.
+  The "dump" operator can take three parameters. The first is whether to show
+  variable values or not, default is to show. The second is the maximum number
+  of levels to recurse, if blank or omitted the maximum level is 1.
   The third is the type of display, if set to "text" the output is as pure text
   otherwise as html. The default output is configured in template.ini.
 
-  The "dump" operator does exactly what the "attribute" operator does with following
-  exceptions:
-  - The default maximum number of levels to recurse is 1
-  - By default, it shows the values of arrays and object properties
-  - it can handle primitive variables and NULL values
-
 \code
-// Example template code for operator 'attribute'
-
-// Display attributes of $myvar
-{$myvar|attribute}
-// Display 2 levels of $tree
-{$tree|attribute(show,2)}
-// Display attributes and values of $item
-{$item|attribute(show)}
-
-
 // Example template code for operator 'dump'
 
-// Dumps out $myvar - can handle primitive variables, arrays and objects.
-// By default it shows array values or object properties.
+// Display attributes of $myvar
 {$myvar|dump()}
-
-// Show 2 levels of $tree (default is 1)
-{$tree|dump(show, 2)}
+// Display 2 levels of $tree
+{$tree|dump(show,2)}
 
 \endcode
 
@@ -60,11 +42,10 @@ class eZTemplateAttributeOperator
      * @param string $attributeName
      * @param string $dumpName
      */
-    public function __construct( $attributeName = 'attribute', $dumpName = 'dump' )
+    public function __construct( $attributeName = '', $dumpName = 'dump' )
     {
-        $this->AttributeName = $attributeName;
         $this->DumpName = $dumpName;
-        $this->Operators = array( $attributeName, $dumpName );
+        $this->Operators = array( $dumpName );
     }
 
     /*!
@@ -77,10 +58,7 @@ class eZTemplateAttributeOperator
 
     function operatorTemplateHints()
     {
-        return array( $this->AttributeName => array( 'input' => true,
-                                                     'output' => true,
-                                                     'parameters' => 3 ),
-                      $this->DumpName => array( 'input' => true,
+        return array( $this->DumpName => array( 'input' => true,
                                                 'outpout' => true,
                                                 'parameters' => 3 ) );
     }
@@ -90,24 +68,15 @@ class eZTemplateAttributeOperator
     */
     function namedParameterList()
     {
-        return array( $this->AttributeName => array( "show_values" => array( "type" => "string",
-                                                                             "required" => false,
-                                                                             "default" => "" ),
-                                                     "max_val"     => array( "type" => "numerical",
-                                                                             "required" => false,
-                                                                             "default" => 2 ),
-                                                     "format"      => array( "type" => "boolean",
-                                                                             "required" => false,
-                                                                             "default" => eZINI::instance( 'template.ini' )->variable( 'AttributeOperator', 'DefaultFormatter' ) ) ),
-                      $this->DumpName =>      array( "show_values" => array( "type" => "string",
-                                                                             "required" => false,
-                                                                             "default" => "show" ),
-                                                     "max_val"     => array( "type" => "numerical",
-                                                                             "required" => false,
-                                                                             "default" => 1 ),
-                                                     "format"      => array( "type" => "boolean",
-                                                                             "required" => false,
-                                                                             "default" => eZINI::instance( 'template.ini' )->variable( 'AttributeOperator', 'DefaultFormatter' ) ) ) );
+        return array( $this->DumpName => array( "show_values" => array( "type" => "string",
+                                                                        "required" => false,
+                                                                        "default" => "show" ),
+                                                "max_val"     => array( "type" => "numerical",
+                                                                        "required" => false,
+                                                                        "default" => 1 ),
+                                                "format"      => array( "type" => "boolean",
+                                                                        "required" => false,
+                                                                        "default" => eZINI::instance( 'template.ini' )->variable( 'AttributeOperator', 'DefaultFormatter' ) ) ) );
     }
 
    /*!
