@@ -23,6 +23,12 @@
         {ezini('SiteSettings','SiteURL')}
     </div>
 
+    {if $ezpublish_commit_hash}
+        <div class="block">
+            <label>{'Last commit hash'|i18n( 'design/admin/setup/info', 'eZ Publish version' )}:</label>
+            <a href="https://github.com/mugoweb/ezpublish-legacy/commits/{$ezpublish_commit_hash}">{$ezpublish_commit_hash}</a>
+        </div>
+    {/if}
     <div class="block">
         <label>{'Code version'|i18n( 'design/admin/setup/info', 'eZ Publish version' )}:</label>
         {$ezpublish_version}
@@ -30,14 +36,6 @@
     <div class="block">
         <label>{'Edition'|i18n( 'design/admin/setup/info', 'eZ Publish edition' )}:</label>
         {$ezpublish_edition}
-    </div>
-    <div class="block">
-        <label>{'Database version'|i18n( 'design/admin/setup/info' )}:</label>
-        {$ezpublish_db_version}
-    </div>
-    <div class="block">
-        <label>{'Database version release'|i18n( 'design/admin/setup/info' )}:</label>
-        {$ezpublish_db_version_release}
     </div>
     <div class="block">
         <label>{'Database schema version'|i18n( 'design/admin/setup/info' )}:</label>

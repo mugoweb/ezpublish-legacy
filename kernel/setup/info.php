@@ -76,6 +76,7 @@ if ( function_exists( 'apache_get_version' ) )
         $webserverInfo['modules'] = apache_get_modules();
 }
 
+$tpl->setVariable( 'ezpublish_commit_hash', eZPublishSDK::GIT_COMMIT_HASH );
 $tpl->setVariable( 'ezpublish_version', eZPublishSDK::version() . " (" . eZPublishSDK::VERSION_ALIAS . ")" );
 $tpl->setVariable( 'ezpublish_edition', eZPublishSDK::EDITION );
 $tpl->setVariable( 'ezpublish_db_version', eZSiteData::fetchByName( 'ezpublish-version' )->value );

@@ -14,6 +14,7 @@
 
 class eZPublishSDK
 {
+    const GIT_COMMIT_HASH = '';
     const VERSION_MAJOR = 1;
     const VERSION_MINOR = 0;
     const VERSION_RELEASE = 0;

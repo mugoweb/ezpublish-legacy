@@ -17,6 +17,14 @@ eZ Publish is database, platform and browser independent. Because it is
 browser based it can be used and updated from anywhere as long as you have
 access to the Internet.
 
+Installation
+------------
+Read doc/INSTALL or go to http://doc.ez.no/eZ-Publish
+
+How to upgrade and use the lovestack version
+--
+The eZ Publish upgrade process and how you can switch to
+the lovestack is documented in [update/README.md](update/README.md)
 
 License
 -------
@@ -69,11 +77,6 @@ Main eZ Publish features
     - wysiwyg rich-text editor
     - in-site content editing
     - content geolocation
-
-
-Installation
-------------
-Read doc/INSTALL or go to http://doc.ez.no/eZ-Publish
 
 
 Issue tracker
