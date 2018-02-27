@@ -1,8 +1,8 @@
 Upgrading a lovestack installation
 =
-The lovestack is a fork of the eZPublish legacy
+The lovestack is a fork of the eZ Publish legacy
 project. This document describes the process of
-upgrade from a eZPublish legacy version to the
+upgrade from an eZ Publish legacy version to the
 latest lovestack version.
 If you already use the lovestack and just want
 to upgrade to the latest version you should look
@@ -10,20 +10,18 @@ at _Upgrading to the latest version of the lovestack_
 
 General notes
 ==
-Consider to make a backup of your installation. That
+Consider making a backup of your installation. That
 includes your current code version, your database content
 and your content in the var folder (assets like images etc).
 
 
-Upgrading from an eZPublish legacy version
+Upgrading from an eZ Publish legacy version
 ==
-Before you can use the lovestack version you have
-to make sure that you upgrade your eZPublish legacy
-installation to the version 5.4.x
+Before you can use the lovestack version you need
+upgrade your eZ Publish legacy installation to the version 5.4.x
 
-The upgrade path is documented until version 5.2. You
-find the documentation here:
-https://doc.ez.no/eZ-Publish/Upgrading
+The upgrade path is documented until version 5.2. You can
+find the documentation here: https://doc.ez.no/eZ-Publish/Upgrading
 
 Further upgrade from 5.2 to 5.4 is documented here:
 https://doc.ez.no/display/EZP/Updating
@@ -47,7 +45,7 @@ This instruction assumes that you have an existing ezp
 publish installation on your system (for example under
 _/var/www/ezp_).
 It also assumes that you developed all your customizations
-in custom ezpublish extension and that all changes to settings
+in a custom eZ Publish extension and that all changes to settings
 are under the _override_ folder or under a _siteaccess_ folder.
 
 
@@ -71,9 +69,9 @@ php update/run.php #In order to get the help screen
 php update/run.php <parameters> #provide the necessary parameters
 ```
 
-Store the commit hash into eZPublish. It will allow you
+Store the commit hash in eZ Publish. It will allow you
 to always check what code version of the lovestack you're
-running. You get the commit has with the command `git rev-parse HEAD`.
+running. You get the commit hash with the command `git rev-parse HEAD`.
 That hash string needs to be added to `lib/version.php`.
 
 ```
@@ -88,7 +86,7 @@ php bin/php/ezpgenerateautoloads.php -e
 php bin/php/ezcache.php --clear-all
 ```
 
-The upgrade process is now done. In case you installation is
+The upgrade process is now done. In case your installation is
 connected to a code repository, you can now commit the changes
 to that repository.
 
@@ -104,7 +102,7 @@ Notes about legacy_2018 extension
 ==
 The lovestack fork has an eZ Publish extension called _legacy_2018_.
 It contains features that are considered old and unwanted in the
-core system of ezpublish ( _kernel_ or _lib_ feature). In most cases
+core system of eZ Publish ( _kernel_ or _lib_ feature). In most cases
 you don't want to enable this extension unless your project depends
-on the feature that is no located in the extension. See the extension
+on the feature that is now located in the extension. See the extension
 README.md file for more details
