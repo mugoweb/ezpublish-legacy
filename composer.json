@@ -30,16 +30,9 @@
         "ext-simplexml": "*",
         "ezsystems/ezpublish-legacy-installer": "*",
         "ezsystems/ezautosave-ls": "~5.3",
-        "ezsystems/ezdemo-ls-extension": "~5.4",
         "ezsystems/ezflow-ls-extension": "~5.3",
-        "ezsystems/ezgmaplocation-ls-extension": "~5.3",
-        "ezsystems/ezie-ls": "~5.3",
-        "ezsystems/ezmbpaex-ls": "~5.3",
-        "ezsystems/ezmultiupload-ls": "~5.3",
-        "ezsystems/ezodf-ls": "~5.3",
-        "ezsystems/ezprestapiprovider-ls": "~5.3",
-        "ezsystems/ezstarrating-ls-extension": "~5.3",
         "ezsystems/ezwt-ls-extension": "~5.3",
+        "ezsystems/ezfind-ls": "dev-master",
         "zetacomponents/archive": "~1.5",
         "zetacomponents/authentication": "~1.4",
         "zetacomponents/authentication-database-tiein": "~1.2",
@@ -63,6 +56,12 @@
         "phpunit/phpunit": "3.7.*",
         "zetacomponents/php-generator": "~1.1"
     },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/mugoweb/ezfind.git"
+        }
+    ],
     "autoload": {
       "files": ["autoload.php"]
     },
