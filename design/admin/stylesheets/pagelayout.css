@@ -473,7 +473,7 @@ ul.leftmenu-items li.current a
 {
     position: absolute;
     right: 20px;
-    top: 0px;
+    top: 0;
     bottom: 0; /* strech div to full width of relative box */
     width: 10px;
     cursor: col-resize;
