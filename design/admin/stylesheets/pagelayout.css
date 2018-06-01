@@ -476,7 +476,6 @@ ul.leftmenu-items li.current a
     top: 0px;
     bottom: 0; /* strech div to full width of relative box */
     width: 10px;
-    height: auto;
     cursor: col-resize;
     z-index:11;
 /*    background: #f8f8f8;*/
