@@ -2803,25 +2803,13 @@ class eZContentObjectTreeNode extends eZPersistentObject
     static function assignSectionToSubTree( $nodeID, $sectionID, $oldSectionID = false )
     {
         $db = eZDB::instance();
-
         $node = eZContentObjectTreeNode::fetch( $nodeID );
-        $nodePath =  $node->attribute( 'path_string' );
+
+        $objectSimpleIDArray = eZContentObjectTreeNode::getObjectIdsInNodeSubTree($node);
+        if ( !$objectSimpleIDArray )
+            return;
 
         $sectionID =(int) $sectionID;
-
-        $pathString = " path_string like '$nodePath%' AND ";
-
-        // fetch the object id's which needs to be updated
-        $objectIDArray = $db->arrayQuery( "SELECT
-                                                   ezcontentobject.id
-                                            FROM
-                                                   ezcontentobject_tree, ezcontentobject
-                                            WHERE
-                                                  $pathString
-                                                  ezcontentobject_tree.contentobject_id=ezcontentobject.id AND
-                                                  ezcontentobject_tree.main_node_id=ezcontentobject_tree.node_id" );
-        if ( count( $objectIDArray ) == 0 )
-            return;
 
         // Who assigns which section at which node should be logged.
         $section = eZSection::fetch( $sectionID );
@@ -2831,12 +2819,6 @@ class eZContentObjectTreeNode extends eZPersistentObject
                                                       'Content object ID' => $object->attribute( 'id' ),
                                                       'Content object name' => $object->attribute( 'name' ),
                                                       'Comment' => 'Assigned a section to the current node and all child objects: eZContentObjectTreeNode::assignSectionToSubTree()' ) );
-
-        $objectSimpleIDArray = array();
-        foreach ( $objectIDArray as $objectID )
-        {
-            $objectSimpleIDArray[] = $objectID['id'];
-        }
 
         $filterPart = '';
         if ( $oldSectionID !== false )
@@ -6432,6 +6414,39 @@ class eZContentObjectTreeNode extends eZPersistentObject
                         'AsObject' => false
                     )
                 ) == 0 ;
+    }
+
+    /**
+     * Returns an array of Object IDs inside node subtree or null when empty.
+     * @param $node
+     * @return array|null
+     */
+    static function getObjectIdsInNodeSubTree($node)
+    {
+        $db = eZDB::instance();
+        $nodePath =  $node->attribute( 'path_string' );
+        $pathString = " path_string like '$nodePath%' AND ";
+
+        $objectIDArray = $db->arrayQuery( "SELECT
+                                           ezcontentobject.id
+                                    FROM
+                                           ezcontentobject_tree, ezcontentobject
+                                    WHERE
+                                          $pathString
+                                          ezcontentobject_tree.contentobject_id=ezcontentobject.id AND
+                                          ezcontentobject_tree.main_node_id=ezcontentobject_tree.node_id" );
+
+        if ( count( $objectIDArray ) == 0 )
+            return null;
+
+        $objectSimpleIDArray = array();
+
+        foreach ( $objectIDArray as $objectID )
+        {
+            $objectSimpleIDArray[] = $objectID['id'];
+        }
+
+        return $objectSimpleIDArray;
     }
 
     /**
