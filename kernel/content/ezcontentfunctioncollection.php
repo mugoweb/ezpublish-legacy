@@ -342,6 +342,12 @@ class eZContentFunctionCollection
             $treeParameters['DepthOperator'] = $depthOperator;
         }
 
+        // Set an unset ClassFilterType to 'include' if 'ClassFilterArray' is set
+        if( !empty( $treeParameters[ 'ClassFilterArray' ] ) && !$treeParameters[ 'ClassFilterType' ] )
+        {
+            $treeParameters[ 'ClassFilterType' ] = 'include';
+        }
+
         $children = null;
         if ( is_numeric( $parentNodeID ) or is_array( $parentNodeID ) )
         {
