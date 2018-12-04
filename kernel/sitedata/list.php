@@ -7,8 +7,8 @@ $conditions = null;
 
 if( $filter )
 {
-    $filter = str_replace( '*', '%', $filter );
-    $conditions = array( 'name' => array( 'like', $filter ) );
+    $dbFilter = str_replace( '*', '%', $filter );
+    $conditions = array( 'name' => array( 'like', $dbFilter ) );
 }
 
 $entries = eZSiteData::fetchObjectList(
