@@ -201,7 +201,6 @@ class eZPolicyLimitation extends eZPersistentObject
     {
         $returnValue = null;
         $valueList   = $this->attribute( 'values_as_array' );
-        $names       = array();
         $policy      = $this->attribute( 'policy' );
         if ( !$policy )
         {
@@ -216,7 +215,6 @@ class eZPolicyLimitation extends eZPersistentObject
             return $returnValue;
         }
         $functions = $mod->attribute( 'available_functions' );
-        $functionNames = array_keys( $functions );
 
         $currentFunction = $policy->attribute( 'function_name' );
         $limitationValueArray = array();
