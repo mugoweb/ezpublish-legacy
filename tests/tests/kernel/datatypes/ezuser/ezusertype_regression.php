@@ -45,6 +45,9 @@ class eZUserTypeRegression extends ezpDatabaseTestCase
 
         $contentObject = eZContentFunctions::createAndPublishObject( $params );
 
+        // Re-fetch to get the object after it was published
+        $contentObject = eZContentObject::fetch( $contentObject->ID );
+
         if( !$contentObject instanceof eZContentObject )
         {
             die( 'Impossible to create user object' );
@@ -191,38 +194,19 @@ class eZUserTypeRegression extends ezpDatabaseTestCase
     public function testUpdatePasswordUpdatesSerializedData()
     {
         $userId = $this->userObject->attribute('id');
-
-        $passwordHash = $this->getSerializedPasswordHash($this->userObject);
+        $user = ezuser::fetch( $userId );
+        $passwordHash = $user->PasswordHash;
 
         eZUserOperationCollection::password($userId, 'newpassword');
 
-        print_r( eZContentObject::fetch($userId) );
-        $updatedPasswordHash = $this->getSerializedPasswordHash( eZContentObject::fetch($userId) );
+        $user = ezuser::fetch( $userId );
+        $updatedPasswordHash = $user->PasswordHash;
 
         self::assertNotEquals(
             $passwordHash,
             $updatedPasswordHash,
             "The password hash stored in the user attribute should have been updated"
         );
-    }
-
-    /**
-     * @param \eZContentObject $userObject
-     *
-     * @return string The serialized password hash, or null if none is set
-     */
-    private function getSerializedPasswordHash(eZContentObject $userObject)
-    {
-        $dataMap = $userObject->dataMap();
-
-        $userAccountAttributeText = $dataMap['user_account']->attribute('data_text');
-
-        // empty on initial version
-        if (!empty($userAccountAttributeText)) {
-            return json_decode($userAccountAttributeText)->password_hash;
-        }
-
-        return null;
     }
 
     /**
