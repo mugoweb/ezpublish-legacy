@@ -29,7 +29,7 @@ class ezjscCacheManager
             $clusterHandler->filePath = $file;
             $clusterHandler->loadMetaData();
             $metaData = $clusterHandler->metaData;
-            
+
             // If the timestamp is before than $maxAge
             if( $metaData[ 'mtime' ] < self::getMaxAge() )
             {
@@ -59,11 +59,15 @@ class ezjscCacheManager
     private static function getMaxAge()
     {
         $ini = eZINI::instance();
-        if( $ini->hasVariable( "Cache_ezjscore", "Maxage" ) )
+        if( $ini->hasVariable( 'Cache_ezjscore', 'Maxage' ) )
         {
-            if( $ini->variable( "Cache_ezjscore", "Maxage" ) )
+            if( $ini->variable( 'Cache_ezjscore', 'Maxage' ) )
             {
-                return strtotime( "-" . $ini->variable( "Cache_ezjscore", "Maxage" ) );
+                return strtotime(
+                    '-' .
+                    (int) $ini->variable( 'Cache_ezjscore', 'Maxage' ) .
+                    ' days'
+                );
             }
             else
             {
@@ -72,7 +76,7 @@ class ezjscCacheManager
         }
         else
         {
-            return strtotime( "-90 days" );
+            return strtotime( '-90 days' );
         }
     }
 }
