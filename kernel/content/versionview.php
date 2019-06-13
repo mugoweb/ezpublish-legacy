@@ -264,7 +264,9 @@ $designKeys = array( array( 'object', $contentObject->attribute( 'id' ) ), // Ob
                      array( 'remote_id', $contentObject->attribute( 'remote_id' ) ),
                      array( 'class', $class->attribute( 'id' ) ), // Class ID
                      array( 'class_identifier', $class->attribute( 'identifier' ) ), // Class identifier
-                     array( 'viewmode', 'full' ) );  // View mode
+                     array( 'viewmode', 'full' ),
+                     array( 'layout', false )
+);  // View mode
 
 if ( $assignment )
 {
@@ -272,7 +274,6 @@ if ( $assignment )
     if ( $parentNodeObject instanceof eZContentObjectTreeNode )
         $designKeys[] = array( 'depth', $parentNodeObject->attribute( 'depth' ) + 1 );
 }
-
 
 $res->setKeys( $designKeys );
 
