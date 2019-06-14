@@ -35,6 +35,8 @@ class eZMailNotificationTransport extends eZNotificationTransport
         if ( !$emailSender )
             $emailSender = $ini->variable( "MailSettings", "AdminEmail" );
 
+        $mail->addReceiver( 'undisclosed-recipients:;', '' );
+
         foreach ( $addressList as $addressItem )
         {
             $mail->extractEmail( $addressItem, $email, $name );
