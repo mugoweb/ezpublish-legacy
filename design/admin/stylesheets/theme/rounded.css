@@ -208,11 +208,6 @@ a.show-hide-tabs:hover
     height:25px;
 }
 
-.controlbar form .button-left .block input.button, .controlbar form .button-left .block input.button-disabled, .controlbar form .button-left .block a.button, .controlbar form .button-left .block a.button-disabled
-{
-    margin-top: -3px;
-}
-
 #controlbar-top .box-bc
 {
     border: 1px solid #ccc;
