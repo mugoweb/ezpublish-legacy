@@ -36,6 +36,15 @@ class eZURITest extends ezpTestCase
         parent::tearDown();
     }
 
+//    public function testBuild()
+//    {
+//        $url = '/';
+//
+//        $result = eZURI::build( $url, false, 'full' );
+//
+//        $this->assertSame( $result, 'asdf', 'Building the URL failed' );
+//    }
+
     public function testInstanceRepeatedCallsWithoutUri()
     {
         $docstring = "Calling eZURI::instance() twice with eZSys::requestURI()"
