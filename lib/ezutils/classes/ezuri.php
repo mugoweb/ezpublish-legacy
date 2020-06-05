@@ -597,16 +597,16 @@ class eZURI
      * Wrapper function for transformURI
      *
      * @param string $url
-     * @param bool $ignoreIndexDir
-     * @param string $serverURL full|relative
-     * @param bool $htmlEscape true to html escape the result
+     * @param bool $full
      * @return string
      */
-    public static function build( $url, $ignoreIndexDir = false, $serverURL = null, $htmlEscape = true )
+    public static function build( $url, $full = false )
     {
+        $serverURL = $full ? 'full' : 'relative';
+
         // Avoid changing origin $url value
         $url2 = $url;
-        $result = self::transformURI( $url2, $ignoreIndexDir, $serverURL, $htmlEscape );
+        $result = self::transformURI( $url2, false, $serverURL );
 
         if( !$result )
         {
