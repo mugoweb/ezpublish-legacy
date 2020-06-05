@@ -604,7 +604,7 @@ class eZURI
     {
         $serverURL = $full ? 'full' : 'relative';
 
-        // Avoid changing origin $url value
+        // Avoid changing original $url value
         $url2 = $url;
         $result = self::transformURI( $url2, false, $serverURL );
 
