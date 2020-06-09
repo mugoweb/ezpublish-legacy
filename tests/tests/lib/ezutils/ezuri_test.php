@@ -42,7 +42,7 @@ class eZURITest extends ezpTestCase
 
         $result = eZURI::build( $url, true );
 
-        $this->assertSame( $result, 'http://example.com/my/path', 'Building the URL failed' );
+        $this->assertSame( $result, 'http://example.com/test/my/path', 'Building the URL failed' );
     }
 
     public function testBuildRelativeUrl()
@@ -51,7 +51,7 @@ class eZURITest extends ezpTestCase
 
         $result = eZURI::build( $url, false );
 
-        $this->assertSame( $result, '/my/path', 'Building the URL failed' );
+        $this->assertSame( $result, '/test/my/path', 'Building the URL failed' );
     }
 
     public function testInstanceRepeatedCallsWithoutUri()
