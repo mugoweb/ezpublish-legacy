@@ -158,19 +158,19 @@ class eZStringType extends eZDataType
             return eZInputValidator::STATE_INVALID;
     }
 
-	/**
-	 * Fetches the http post var string input and stores it in the data instance.
-	 * @param $http
-	 * @param string $base
-	 * @param eZContentObjectAttribute $contentObjectAttribute
-	 * @return bool|void
-	 */
+    /**
+     * Fetches the http post var string input and stores it in the data instance.
+     * @param $http
+     * @param string $base
+     * @param eZContentObjectAttribute $contentObjectAttribute
+     * @return bool|void
+     */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
-		$classAttribute = $contentObjectAttribute->contentClassAttribute();
-		$doTrim = (bool)$classAttribute->attribute( self::TRIM_FIELD );
+        $classAttribute = $contentObjectAttribute->contentClassAttribute();
+        $doTrim = (bool)$classAttribute->attribute( self::TRIM_FIELD );
 
-		if ( $http->hasPostVariable( $base . '_ezstring_data_text_' . $contentObjectAttribute->attribute( 'id' ) ) )
+        if ( $http->hasPostVariable( $base . '_ezstring_data_text_' . $contentObjectAttribute->attribute( 'id' ) ) )
         {
             $data = $http->postVariable( $base . '_ezstring_data_text_' . $contentObjectAttribute->attribute( 'id' ) );
             $data = $doTrim ? trim( $data ) : $data;
