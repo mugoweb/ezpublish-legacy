@@ -272,6 +272,9 @@ class eZStringType extends eZDataType
         $defaultValueName = $base . self::DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
         $trimName = $base . self::TRIM_VARIABLE . $classAttribute->attribute( 'id' );
 
+        // This function is also called when creating a new content class version
+        $isSubmit = $http->hasPostVariable( $maxLenName );
+
         if ( $http->hasPostVariable( $maxLenName ) )
         {
             $maxLenValue = $http->postVariable( $maxLenName );
@@ -282,9 +285,10 @@ class eZStringType extends eZDataType
             $defaultValueValue = $http->postVariable( $defaultValueName );
             $classAttribute->setAttribute( self::DEFAULT_STRING_FIELD, $defaultValueValue );
         }
-        if ( $http->hasPostVariable( $trimName ) )
+
+        if( $isSubmit )
         {
-            $classAttribute->setAttribute( self::TRIM_FIELD, 1 );
+            $classAttribute->setAttribute( self::TRIM_FIELD, (int)$http->hasPostVariable( $trimName ) );
         }
 
         return true;
