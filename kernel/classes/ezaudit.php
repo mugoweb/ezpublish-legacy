@@ -130,4 +130,4 @@ class eZAudit
         return $nameSettings;
     }
 }
-?>
+

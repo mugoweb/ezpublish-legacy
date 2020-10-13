@@ -207,10 +207,6 @@ class eZStringType extends eZDataType
         return true;
     }
 
-    function storeClassAttribute( $attribute, $version )
-    {
-    }
-
     function storeDefinedClassAttribute( $attribute )
     {
     }
@@ -255,7 +251,7 @@ class eZStringType extends eZDataType
         $defaultValueName = $base . self::DEFAULT_STRING_VARIABLE . $classAttribute->attribute( 'id' );
         if ( $http->hasPostVariable( $maxLenName ) )
         {
-            $maxLenValue = $http->postVariable( $maxLenName );
+            $maxLenValue = (int) $http->postVariable( $maxLenName );
             $classAttribute->setAttribute( self::MAX_LEN_FIELD, $maxLenValue );
         }
         if ( $http->hasPostVariable( $defaultValueName ) )
@@ -391,4 +387,3 @@ class eZStringType extends eZDataType
 
 eZDataType::register( eZStringType::DATA_TYPE_STRING, 'eZStringType' );
 
-?>

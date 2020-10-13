@@ -613,4 +613,3 @@ WHERE ezbasket.session_id = ezsession.session_key AND
     }
 }
 
-?>

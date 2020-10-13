@@ -230,7 +230,7 @@ class eZMatrixType extends eZDataType
         else
         {
             $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
-            $numRows = $contentClassAttribute->attribute( 'data_int1' );
+            $numRows = (int)$contentClassAttribute->attribute( 'data_int1' );
             $matrix = new eZMatrix( '', $numRows, $contentClassAttribute->attribute( 'content' ) );
             // 'default name' is never used => just a stub
             // $matrix->setName( $contentClassAttribute->attribute( 'data_text1' ) );
@@ -436,7 +436,7 @@ class eZMatrixType extends eZDataType
         if ( $content )
         {
             $defaultName = $classAttribute->attribute( 'data_text1' );
-            $defaultRowCount = $classAttribute->attribute( 'data_int1' );
+            $defaultRowCount = (int)$classAttribute->attribute( 'data_int1' );
             $columns = $content->attribute( 'columns' );
 
             $dom = $attributeParametersNode->ownerDocument;
@@ -465,7 +465,7 @@ class eZMatrixType extends eZDataType
         $defaultName = $attributeParametersNode->getElementsByTagName( 'default-name' )->item( 0 )->textContent;
         $defaultRowCount = $attributeParametersNode->getElementsByTagName( 'default-row-count' )->item( 0 )->textContent;
         $classAttribute->setAttribute( 'data_text1', $defaultName );
-        $classAttribute->setAttribute( 'data_int1', $defaultRowCount );
+        $classAttribute->setAttribute( 'data_int1', (int)$defaultRowCount );
 
         $matrixDefinition = new eZMatrixDefinition();
         $columnsNode = $attributeParametersNode->getElementsByTagName( 'columns' )->item( 0 );
@@ -506,7 +506,7 @@ class eZMatrixType extends eZDataType
 
     function batchInitializeObjectAttributeData( $classAttribute )
     {
-        $numRows = $classAttribute->attribute( 'data_int1' );
+        $numRows = (int)$classAttribute->attribute( 'data_int1' );
         $matrix = new eZMatrix( '', $numRows, $classAttribute->attribute( 'content' ) );
         $db = eZDB::instance();
         return array( 'data_text' => "'" . $db->escapeString( $matrix->xmlString() ) . "'" );
