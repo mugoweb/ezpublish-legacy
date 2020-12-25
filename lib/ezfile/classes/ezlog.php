@@ -19,7 +19,7 @@
 class eZLog
 {
     const MAX_LOGROTATE_FILES = 3;
-    const MAX_LOGFILE_SIZE = 204800; // 200*1024
+    const MAX_LOGFILE_SIZE = 2048000; // 2000*1024
 
     /*!
      \static
