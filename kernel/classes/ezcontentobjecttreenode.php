@@ -3189,11 +3189,17 @@ class eZContentObjectTreeNode extends eZPersistentObject
         return $returnValue;
     }
 
-    function fetchParent()
+    /**
+     * @return eZContentObjectTreeNode|null
+     */
+    public function fetchParent()
     {
         return $this->fetch( $this->attribute( 'parent_node_id' ) );
     }
 
+    /**
+     * @return array
+     */
     function pathArray()
     {
         $pathString = $this->attribute( 'path_string' );
@@ -3207,7 +3213,9 @@ class eZContentObjectTreeNode extends eZPersistentObject
         return $pathArray;
     }
 
-
+    /**
+     * @return eZContentObjectTreeNodep[]|false
+     */
     function fetchPath()
     {
         $nodePath = $this->attribute( 'path_string' );
