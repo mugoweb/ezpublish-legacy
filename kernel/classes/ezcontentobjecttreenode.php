@@ -5878,14 +5878,13 @@ class eZContentObjectTreeNode extends eZPersistentObject
     /**
      * Returns the node's class identifier
      *
-     * @return string|bool|string|null
+     * @return string|bool|null
      */
     public function classIdentifier()
     {
         if ( $this->ClassIdentifier === null )
         {
-            $object = $this->object();
-            $this->ClassIdentifier = $object->contentClassIdentifier();
+            $this->ClassIdentifier = $this->object()->contentClassIdentifier();
         }
 
         return $this->ClassIdentifier;
