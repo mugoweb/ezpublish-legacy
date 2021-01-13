@@ -32,7 +32,7 @@
         "ext-spl": "*",
         "ext-simplexml": "*",
         "ext-intl": "*",
-        "symfony/polyfill-php73",:  "^1.9",
+        "symfony/polyfill-php73":  "^1.9",
         "ezsystems/ezpublish-legacy-installer": "*",
         "zetacomponents/archive": "~1.5",
         "zetacomponents/authentication": "~1.4",
