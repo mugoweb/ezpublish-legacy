@@ -3214,7 +3214,7 @@ class eZContentObjectTreeNode extends eZPersistentObject
     }
 
     /**
-     * @return eZContentObjectTreeNodep[]|false
+     * @return eZContentObjectTreeNode[]|false
      */
     function fetchPath()
     {
