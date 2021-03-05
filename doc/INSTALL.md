@@ -11,7 +11,7 @@ With composer
 1) Use [this vhost configuration file](/doc/apache2/legacy.conf) as an example to configure Apache
 1) Create a database - following example is for mysql
    ```
-   CREATE DATABASE ezpublish charset utf8;
+   CREATE DATABASE ezpublish charset utf8mb4;
    CREATE USER 'ezpublish'@'localhost' IDENTIFIED BY 'secretPassword';
    GRANT ALL PRIVILEGES ON * . * TO 'ezpublish'@'localhost';
    FLUSH PRIVILEGES;
