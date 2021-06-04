@@ -50,10 +50,6 @@ class eZKeywordType extends eZDataType
         }
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -80,9 +76,6 @@ class eZKeywordType extends eZDataType
         return eZInputValidator::STATE_ACCEPTED;
     }
 
-    /*!
-     Fetches the http post var keyword input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . '_ezkeyword_data_text_' . $contentObjectAttribute->attribute( 'id' ) ) )
@@ -96,10 +89,6 @@ class eZKeywordType extends eZDataType
         return false;
     }
 
-    /*!
-     Does nothing since it uses the data_text field in the content object attribute.
-     See fetchObjectAttributeHTTPInput for the actual storing.
-    */
     function storeObjectAttribute( $attribute )
     {
         // create keyword index
@@ -132,9 +121,10 @@ class eZKeywordType extends eZDataType
         return true;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return eZKeyword
+     */
     function objectAttributeContent( $attribute )
     {
         $keyword = new eZKeyword();
@@ -143,9 +133,6 @@ class eZKeywordType extends eZDataType
         return $keyword;
     }
 
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
     function metaData( $attribute )
     {
         $keyword = new eZKeyword();
@@ -155,9 +142,6 @@ class eZKeywordType extends eZDataType
         return $return;
     }
 
-    /*!
-     Delete stored object attribute
-    */
     function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
     {
         if ( $version != null ) // Do not delete if discarding draft
@@ -206,9 +190,6 @@ class eZKeywordType extends eZDataType
                      WHERE objectattribute_id='$contentObjectAttributeID'" );
     }
 
-    /*!
-     Returns the content of the keyword for use as a title
-    */
     function title( $attribute, $name = null )
     {
         $keyword = new eZKeyword();
@@ -232,13 +213,6 @@ class eZKeywordType extends eZDataType
         return true;
     }
 
-    /**
-     *
-     * Returns string representation of an contentobjectattribute data for simplified export
-     *
-     * @param eZContentObjectAttribute $contentObjectAttribute
-     * @return string
-     */
     function toString( $contentObjectAttribute )
     {
         $keyword = new eZKeyword();

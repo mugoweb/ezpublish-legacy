@@ -27,9 +27,6 @@ class eZURLType extends eZDataType
         $this->MaxLenValidator = new eZIntegerValidator();
     }
 
-    /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -53,10 +50,6 @@ class eZURLType extends eZDataType
         }
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_ezurl_url_" . $contentObjectAttribute->attribute( "id" ) )  and
@@ -113,9 +106,6 @@ class eZURLType extends eZDataType
         $db->commit();
     }
 
-    /*!
-     Fetches the http post var url input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . '_ezurl_url_' . $contentObjectAttribute->attribute( 'id' ) ) and
@@ -133,9 +123,6 @@ class eZURLType extends eZDataType
         return false;
     }
 
-    /*!
-      Makes some post-store operations. Called by framework after store of eZContentObjectAttribute object.
-    */
     function postStore( $objectAttribute )
     {
         // Update url-object link
@@ -165,9 +152,12 @@ class eZURLType extends eZDataType
         }
     }
 
-    /*!
-      Store the URL in the URL database and store the reference to it.
-    */
+    /**
+     * Stores the URL in the URL database and store the reference to it.
+     *
+     * @param eZContentObjectAttribute $attribute
+     * @return void
+     */
     function storeObjectAttribute( $attribute )
     {
         $urlValue = $attribute->content();
@@ -185,7 +175,6 @@ class eZURLType extends eZDataType
         {
             $attribute->setAttribute( 'data_int', 0 );
         }
-
     }
 
     function storeClassAttribute( $attribute, $version )
@@ -201,9 +190,10 @@ class eZURLType extends eZDataType
         return eZInputValidator::STATE_ACCEPTED;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return string|bool
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         if ( !$contentObjectAttribute->attribute( 'data_int' ) )
@@ -229,17 +219,11 @@ class eZURLType extends eZDataType
         return false;
     }
 
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
     function metaData( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_text' );
     }
 
-    /*!
-     Returns the content of the url for use as a title
-    */
     function title( $contentObjectAttribute, $name = null )
     {
         return  $contentObjectAttribute->attribute( 'data_text' );
@@ -265,7 +249,6 @@ class eZURLType extends eZDataType
         }
         return $exportData;
     }
-
 
     function fromString( $contentObjectAttribute, $string )
     {
@@ -300,12 +283,6 @@ class eZURLType extends eZDataType
         }
     }
 
-    /*!
-     \param package
-     \param content attribute
-
-     \return a DOM representation of the content object attribute
-    */
     function serializeContentObjectAttribute( $package, $objectAttribute )
     {
         $node = $this->createContentObjectAttributeDOMNode( $objectAttribute );
@@ -335,11 +312,6 @@ class eZURLType extends eZDataType
         return $node;
     }
 
-    /*!
-     \param package
-     \param contentobject attribute object
-     \param domnode object
-    */
     function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
     {
         $urlNode = $attributeNode->getElementsByTagName( 'url' )->item( 0 );

@@ -8,13 +8,11 @@
  * @package kernel
  */
 
-/*!
-  \class eZTimeType eztimetype.php
-  \ingroup eZDatatype
-  \brief Stores a time value
-
-*/
-
+/**
+ * Stores an eZTime object
+ *
+ * @package kernel
+ */
 class eZTimeType extends eZDataType
 {
     const DATA_TYPE_STRING = "eztime";
@@ -148,9 +146,6 @@ class eZTimeType extends eZDataType
             return eZInputValidator::STATE_INVALID;
     }
 
-   /*!
-    Fetches the http post variables for collected information
-   */
     function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -177,9 +172,10 @@ class eZTimeType extends eZDataType
         return false;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return array
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         $stamp = $contentObjectAttribute->attribute( 'data_int' );
@@ -216,10 +212,6 @@ class eZTimeType extends eZDataType
         return 'int';
     }
 
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
-
-    */
     function toString( $contentObjectAttribute )
     {
         $time = $contentObjectAttribute->attribute( 'content' );
@@ -255,9 +247,6 @@ class eZTimeType extends eZDataType
         return true;
     }
 
-    /*!
-     Set class attribute value for template version
-    */
     function initializeClassAttribute( $classAttribute )
     {
         if ( $classAttribute->attribute( self::DEFAULT_FIELD ) == null )
@@ -265,9 +254,6 @@ class eZTimeType extends eZDataType
         $classAttribute->store();
     }
 
-    /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -304,17 +290,11 @@ class eZTimeType extends eZDataType
         return false;
     }
 
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
     function metaData( $contentObjectAttribute )
     {
         return (int)$contentObjectAttribute->attribute( 'data_int' );
     }
 
-    /*!
-     Returns the date.
-    */
     function title( $contentObjectAttribute, $name = null )
     {
         $timestamp = $contentObjectAttribute->attribute( 'data_int' );
@@ -359,6 +339,7 @@ class eZTimeType extends eZDataType
 
     function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
+        /** @var DOMElement $defaultNode */
         $defaultNode = $attributeParametersNode->getElementsByTagName( 'default-value' )->item( 0 );
         $defaultValue = strtolower( $defaultNode->getAttribute( 'type' ) );
         switch ( $defaultValue )
@@ -380,12 +361,6 @@ class eZTimeType extends eZDataType
         }
     }
 
-    /*!
-     \param package
-     \param content attribute
-
-     \return a DOM representation of the content object attribute
-    */
     function serializeContentObjectAttribute( $package, $objectAttribute )
     {
         $node = $this->createContentObjectAttributeDOMNode( $objectAttribute );
@@ -402,11 +377,6 @@ class eZTimeType extends eZDataType
         return $node;
     }
 
-    /*!
-     \param package
-     \param contentobject attribute object
-     \param ezdomnode object
-    */
     function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
     {
         $timeNode = $attributeNode->getElementsByTagName( 'time' )->item( 0 );

@@ -8,18 +8,17 @@
  * @package kernel
  */
 
-/*!
-  \class eZIntegerType ezintegertype.php
-  \ingroup eZDatatype
-  \brief A content datatype which handles integers
-
-  It provides the functionality to work as an integer and handles
-  class definition input, object definition input and object viewing.
-
-  It uses the spare field data_int in a content object attribute for storing
-  the attribute data.
-*/
-
+/**
+ * A content datatype which handles integers
+ *
+ * It provides the functionality to work as an integer and handles
+ * class definition input, object definition input and object viewing.
+ *
+ * It uses the spare field data_int in a content object attribute for storing
+ * the attribute data.
+ *
+ * @package kernel
+ */
 class eZIntegerType extends eZDataType
 {
     const DATA_TYPE_STRING = "ezinteger";
@@ -109,10 +108,6 @@ class eZIntegerType extends eZDataType
 
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -152,9 +147,6 @@ class eZIntegerType extends eZDataType
     {
     }
 
-    /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -176,9 +168,6 @@ class eZIntegerType extends eZDataType
         }
     }
 
-    /*!
-     Fetches the http post var integer input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_integer_" . $contentObjectAttribute->attribute( "id" ) ) )
@@ -220,9 +209,6 @@ class eZIntegerType extends eZDataType
             return eZInputValidator::STATE_INVALID;
     }
 
-    /*!
-     Fetches the http post variables for collected information
-    */
     function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_integer_" . $contentObjectAttribute->attribute( "id" ) ) )
@@ -236,9 +222,6 @@ class eZIntegerType extends eZDataType
         return false;
     }
 
-    /*!
-     Does nothing, the data is already present in the attribute.
-    */
     function storeObjectAttribute( $object_attribute )
     {
     }
@@ -373,26 +356,24 @@ class eZIntegerType extends eZDataType
         return false;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return int
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( "data_int" );
     }
 
-
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
+    /**
+     * @inheritdoc
+     * @return int
+     */
     function metaData( $contentObjectAttribute )
     {
         return (int)$contentObjectAttribute->attribute( "data_int" );
     }
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
 
-    */
     function toString( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_int' );
@@ -403,9 +384,6 @@ class eZIntegerType extends eZDataType
         return $contentObjectAttribute->setAttribute( 'data_int', $string );
     }
 
-    /*!
-     Returns the integer value.
-    */
     function title( $contentObjectAttribute, $name = null )
     {
         return $contentObjectAttribute->attribute( "data_int" );
@@ -421,9 +399,6 @@ class eZIntegerType extends eZDataType
         return true;
     }
 
-    /*!
-     \return true if the datatype can be indexed
-    */
     function isIndexable()
     {
         return true;
@@ -504,8 +479,9 @@ class eZIntegerType extends eZDataType
         return true;
     }
 
-    /// \privatesection
-    /// The integer value validator
+    /**
+     * @var eZIntegerValidator
+     */
     public $IntegerValidator;
 }
 
