@@ -251,7 +251,10 @@ class eZUserType extends eZDataType
         else
         {
             // No "draft" for version 1 to avoid regression for existing code creating new users.
-            if ( $contentObjectAttribute->attribute( 'version' ) == '1' )
+            if ( 
+                $contentObjectAttribute->attribute( 'version' ) == '1' &&
+                ! $contentObjectAttribute->hasValidationError()
+            )
             {
                 $user->store();
                 $contentObjectAttribute->setContent( $user );
@@ -386,6 +389,7 @@ class eZUserType extends eZDataType
 
         if ( !empty( $serializedDraft ) )
         {
+            if( !$user ) $user = new eZUser();
             $user = $this->updateUserDraft( $user, $serializedDraft );
         }
 
