@@ -107,7 +107,7 @@ class eZContentUpload
      Most data will be automatically derived from the \c action_name value taken from settings/upload.ini, other
      values will override default values.
     */
-    static function upload( $parameters = array(), $module )
+    static function upload( $parameters = array(), $module = null)
     {
         $ini = eZINI::instance( 'upload.ini' );
 

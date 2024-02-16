@@ -1296,7 +1296,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
      *
      * @return bool|array
      */
-    protected function _selectOne( $query, $fname, $error = false, $debug = false, $fetchCall )
+    protected function _selectOne( $query, $fname, $error = false, $debug = false, $fetchCall = null)
     {
         eZDebug::accumulatorStart( 'mysql_cluster_query', 'MySQL Cluster', 'DB queries' );
         $time = microtime( true );
@@ -1744,7 +1744,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
                 return false;
             }
             $generatingMetaData = mysqli_fetch_assoc( $res );
-            
+
             if ( empty( $generatingMetaData ) )
             {
                 eZDebug::writeError("An error occured while ending cache generation,  $generatingFilePath", $fname );
