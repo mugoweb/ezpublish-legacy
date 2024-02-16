@@ -26,18 +26,20 @@ class eZDFSFileHandlerDFSBackendFilterIterator extends FilterIterator
 
     /**
      * Filters directories out
+     * return type ref: https://www.php.net/manual/en/filteriterator.accept.php
      */
-    public function accept()
+    public function accept(): bool
     {
         return $this->getInnerIterator()->current()->isFile();
     }
 
     /**
      * Transforms the SplFileInfo in a simple relative path
+     * return type ref: https://www.php.net/manual/en/filteriterator.current.php
      *
      * @return string The relative path to the current file
      */
-    public function current()
+    public function current(): mixed
     {
         /** @var SplFileInfo $file */
         $file = $this->getInnerIterator()->current();

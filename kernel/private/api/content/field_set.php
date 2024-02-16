@@ -92,7 +92,7 @@ class ezpContentFieldSet implements ArrayAccess, Iterator
      *
      * @return ezpContentFieldSet
      */
-    public function offsetGet( $offset )
+    public function offsetGet( $offset ): mixed
     {
         // This needs to check if this language can be instanciated (e.g. is active on the installation)
         if ( !isset( $this->childrenFieldSets[$offset] ) )
@@ -183,7 +183,7 @@ class ezpContentFieldSet implements ArrayAccess, Iterator
     /**
      * Iterator::key()
      */
-    public function key()
+    public function key(): mixed
     {
         return current( $this->iteratorPointer );
     }
@@ -191,7 +191,7 @@ class ezpContentFieldSet implements ArrayAccess, Iterator
     /**
      * Iterator::current()
      */
-    public function current()
+    public function current(): mixed
     {
         return $this->iteratorData[current( $this->iteratorPointer )];
     }
@@ -199,7 +199,7 @@ class ezpContentFieldSet implements ArrayAccess, Iterator
     /**
      * Iterator::next()
      */
-    public function next()
+    public function next(): void
     {
         next( $this->iteratorPointer );
     }
@@ -207,7 +207,7 @@ class ezpContentFieldSet implements ArrayAccess, Iterator
     /**
      * Iterator::rewind()
      */
-    public function rewind ()
+    public function rewind (): void
     {
         reset( $this->iteratorPointer );
     }
@@ -215,7 +215,7 @@ class ezpContentFieldSet implements ArrayAccess, Iterator
     /**
      * Iterator::valid()
      */
-    public function valid()
+    public function valid(): bool
     {
         return isset( $this->iteratorData[current( $this->iteratorPointer )] );
     }
