@@ -256,7 +256,10 @@ function eZSetupCheckMagicQuotes( $type )
     if ( version_compare( PHP_VERSION, '7.4' ) >= 0 ) {
         $magicQuote = 0;
     } else {
-        $magicQuote = get_magic_quotes_gpc();
+        //php8 fix - get_magic_quotes_gpc() was removed in php8
+        // repalce it with false based on PHP doc "Always returns false. "
+        //https://www.php.net/manual/en/function.get-magic-quotes-gpc.php
+        $magicQuote = false;
     }
 
     $result = ( $magicQuote == 0 );
