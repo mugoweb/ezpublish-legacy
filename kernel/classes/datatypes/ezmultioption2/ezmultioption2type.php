@@ -77,17 +77,11 @@ class eZMultiOption2Type extends eZDataType
         return true;
     }
 
-    /*!
-     \return The internal XML text.
-    */
     function metaData( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( "data_text" );
     }
 
-    /*!
-     Fetches the http post var integer input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $editMode = $http->postVariable( $base . "_data_edit_mode_" . $contentObjectAttribute->attribute( "id" ) );
@@ -136,6 +130,13 @@ class eZMultiOption2Type extends eZDataType
         return true;
     }
 
+    /**
+     * @param eZMultiOption2 $parentOptionGroup
+     * @param eZHTTPTool $http
+     * @param string $base
+     * @param eZContentObjectAttribute $contentObjectAttribute
+     * @param int $depth
+     */
     function fetchHTTPInputForGroup( $parentOptionGroup, $http, $base, $contentObjectAttribute, $depth = 0 )
     {
 
@@ -198,7 +199,6 @@ class eZMultiOption2Type extends eZDataType
 
                 $newID = $optionGroup->addMultiOption( $multioptionName, $multiOptionPriority, $defaultValue, $multioptionID  );
 
-
                 $optionCountArray = $http->hasPostVariable( $base . "_data_option_option_id_" .
                                                             $contentObjectAttribute->attribute( "id" ) . '_' .
                                                             $optionGroupID . '_' .  $multioptionID )
@@ -252,26 +252,31 @@ class eZMultiOption2Type extends eZDataType
 
     }
 
-
-    /*!
-     This function performs specific actions.
-
-     It has some special actions with parameters which is done by exploding
-     $action into several parts with delimeter '_'.
-     The first element is the name of specific action to perform.
-     The second element will contain the key value or id.
-
-     The various operation's that is performed by this function are as follow.
-     - new-option - A new option is added to a multioption.
-     - remove-selected-option - Removes a selected option.
-     - new_multioption - Adds a new multioption.
-     - remove_selected_multioption - Removes all multioptions given by a selection list
-    */
+    /**
+     * This function performs specific actions.
+     *
+     * It has some special actions with parameters which is done by exploding
+     * $action into several parts with delimeter '_'.
+     * The first element is the name of specific action to perform.
+     * The second element will contain the key value or id.
+     *
+     * The various operation's that is performed by this function are as follow.
+     * - new-option - A new option is added to a multioption.
+     * - remove-selected-option - Removes a selected option.
+     * - new_multioption - Adds a new multioption.
+     * - remove_selected_multioption - Removes all multioptions given by a selection list
+     *
+     * @param eZHTTPTool $http
+     * @param string $action
+     * @param eZContentObjectAttribute $contentObjectAttribute
+     * @param array $parameters
+     */
     function customObjectAttributeHTTPAction( $http, $action, $contentObjectAttribute, $parameters )
     {
         $actionlist = explode( "_", $action );
         if ( $actionlist[0] == "new-option" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $groupID = $actionlist[1];
             $multioptionID = $actionlist[2];
@@ -288,6 +293,7 @@ class eZMultiOption2Type extends eZDataType
         }
         else if ( $actionlist[0] == "new-sublevel" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $groupID = $actionlist[1];
             $multioptionID = $actionlist[2];
@@ -310,6 +316,7 @@ class eZMultiOption2Type extends eZDataType
         }
         else if ( $actionlist[0] == "new-group" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $childGroup = new eZMultiOption2( '', 0, $rootGroup->getMultiOptionIDCounter(),$rootGroup->getOptionCounter() );
             $rootGroup->addChildGroup( $childGroup );
@@ -323,6 +330,7 @@ class eZMultiOption2Type extends eZDataType
         }
         else if ( $actionlist[0] == "remove-selected-option" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $groupID = $actionlist[1];
             $multioptionID = $actionlist[2];
@@ -342,6 +350,7 @@ class eZMultiOption2Type extends eZDataType
         }
         else if ( $actionlist[0] == "new-multioption" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $groupID = $actionlist[1];
             $group = $rootGroup->findGroup( $groupID );
@@ -359,6 +368,7 @@ class eZMultiOption2Type extends eZDataType
         }
         else if ( $actionlist[0] == "remove-selected-multioption" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $groupID = $actionlist[1];
             $postvarname = "ContentObjectAttribute" . "_data_multioption_remove_" . $contentObjectAttribute->attribute( "id" ) . "_" . $groupID;
@@ -384,11 +394,13 @@ class eZMultiOption2Type extends eZDataType
             $editMode = $actionlist[1];
             $sessionVarName = 'eZEnhancedMultioption_edit_mode_' . $contentObjectAttribute->attribute( 'id' );
             $http->setSessionVariable( $sessionVarName, $editMode );
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $contentObjectAttribute->setContent( $rootGroup );
         }
         else if ( $actionlist[0] == "reset-rules" )
         {
+            /** @var eZMultiOption2 $rootGroup */
             $rootGroup = $contentObjectAttribute->content();
             $rootGroup->Rules = array();
             $contentObjectAttribute->setContent( $rootGroup );
@@ -451,7 +463,6 @@ class eZMultiOption2Type extends eZDataType
         else if ( $actionlist[0] == "remove-object" )
         {
 
-
             $rootGroup = $contentObjectAttribute->content();
             $groupID = $actionlist[1];
             $multioptionID = $actionlist[2];
@@ -462,7 +473,6 @@ class eZMultiOption2Type extends eZDataType
             $contentObjectAttribute->setContent( $rootGroup );
             $contentObjectAttribute->store();
 
-
         }
         else
         {
@@ -470,9 +480,6 @@ class eZMultiOption2Type extends eZDataType
         }
     }
 
-    /*!
-     Finds the option which has the correct ID , if found it returns an option structure.
-    */
     function productOptionInformation( $objectAttribute, $optionID, $productItem )
     {
         $optiongroup = $objectAttribute->attribute( 'content' );
@@ -488,10 +495,11 @@ class eZMultiOption2Type extends eZDataType
         return null;
     }
 
-
-    /*!
-      \return \c true if there are more than one multioption in the list.
-    */
+    /**
+     * Returns true if there are more than one multioption in the list.
+     * @param eZContentObjectAttribute $contentObjectAttribute
+     * @return bool
+     */
     function hasObjectAttributeContent( $contentObjectAttribute )
     {
         $groups = $contentObjectAttribute->content();
@@ -499,9 +507,6 @@ class eZMultiOption2Type extends eZDataType
         return count( $grouplist ) > 0;
     }
 
-    /*!
-     Sets default multioption values.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion == false )
@@ -527,11 +532,6 @@ class eZMultiOption2Type extends eZDataType
         return false;
     }
 
-
-    /*!
-     Validates the input for an object attribute during add to basket process
-     and returns a validation state as defined in eZInputValidator.
-    */
     function validateAddToBasket( $objectAttribute, $data, &$errors )
     {
 
@@ -539,7 +539,6 @@ class eZMultiOption2Type extends eZDataType
         $rules = $optiongroup->Rules;
 
         $validationErrors = array();
-
 
         foreach( $data as $moptionID => $selectedItem )
         {
@@ -594,9 +593,6 @@ class eZMultiOption2Type extends eZDataType
         return eZInputValidator::STATE_ACCEPTED;
     }
 
-    /*!
-     \return true if the datatype requires validation during add to basket procedure
-    */
     function isAddToBasketValidationRequired()
     {
         return true;
@@ -637,14 +633,6 @@ class eZMultiOption2Type extends eZDataType
         $objectAttribute->setAttribute( 'data_text', $xmlString );
     }
 
-    /*!
-     \return the template name to use for editing the attribute.
-     \note Default is to return the datatype string which is OK
-           for most datatypes, if you want dynamic templates
-           reimplement this function and return a template name.
-     \note The returned template name does not include the .tpl extension.
-     \sa viewTemplate, informationTemplate
-    */
     function editTemplate( $contentObjectAttribute )
     {
         $http = eZHTTPTool::instance();

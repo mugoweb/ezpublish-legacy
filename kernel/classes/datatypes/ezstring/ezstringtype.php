@@ -8,21 +8,16 @@
  * @package kernel
  */
 
-/*!
-  \class eZStringType ezstringtype.php
-  \ingroup eZDatatype
-  \brief A content datatype which handles text lines
-
-  It provides the functionality to work as a text line and handles
-  class definition input, object definition input and object viewing.
-
-  It uses the spare field data_text in a content object attribute for storing
-  the attribute data.
-
-*/
-
-
-
+/**
+ * A content datatype which handles text lines
+ *
+ * It provides the functionality to work as a text line and handles
+ * class definition input, object definition input and object viewing.
+ *
+ * It uses the spare field data_text in a content object attribute for storing the attribute data.
+ *
+ * @package kernel
+ */
 class eZStringType extends eZDataType
 {
     const DATA_TYPE_STRING = 'ezstring';
@@ -44,9 +39,6 @@ class eZStringType extends eZDataType
         $this->MaxLenValidator = new eZIntegerValidator();
     }
 
-    /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -180,9 +172,6 @@ class eZStringType extends eZDataType
         return false;
     }
 
-    /*!
-     Fetches the http post variables for collected information
-    */
     function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_ezstring_data_text_" . $contentObjectAttribute->attribute( "id" ) ) )
@@ -194,25 +183,15 @@ class eZStringType extends eZDataType
         return false;
     }
 
-    /*!
-     Does nothing since it uses the data_text field in the content object attribute.
-     See fetchObjectAttributeHTTPInput for the actual storing.
-    */
     function storeObjectAttribute( $attribute )
     {
     }
 
-    /*!
-     Simple string insertion is supported.
-    */
     function isSimpleStringInsertionSupported()
     {
         return true;
     }
 
-    /*!
-     Inserts the string \a $string in the \c 'data_text' database field.
-    */
     function insertSimpleString( $object, $objectVersion, $objectLanguage,
                                  $objectAttribute, $string,
                                  &$result )
@@ -294,25 +273,20 @@ class eZStringType extends eZDataType
         return true;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return string
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_text' );
     }
 
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
     function metaData( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_text' );
     }
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
 
-    */
     function toString( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_text' );
@@ -381,6 +355,10 @@ class eZStringType extends eZDataType
         $classAttribute->setAttribute( self::DEFAULT_STRING_FIELD, $defaultString );
     }
 
+    /**
+     * @inheritdoc
+     * @return eZDiffTextEngine
+     */
     function diff( $old, $new, $options = false )
     {
         $diff = new eZDiff();
@@ -410,8 +388,9 @@ class eZStringType extends eZDataType
         return array();
     }
 
-    /// \privatesection
-    /// The max len validator
+    /**
+     * @var eZIntegerValidator
+     */
     public $MaxLenValidator;
 }
 

@@ -28,9 +28,6 @@ class eZTextType extends eZDataType
                                   'object_serialize_map' => array( 'data_text' => 'text' ) ) );
     }
 
-    /*!
-     Set class attribute value for template version
-    */
     function initializeClassAttribute( $classAttribute )
     {
         if ( $classAttribute->attribute( self::COLS_FIELD ) == null )
@@ -38,9 +35,6 @@ class eZTextType extends eZDataType
         $classAttribute->store();
     }
 
-    /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -56,10 +50,6 @@ class eZTextType extends eZDataType
         }
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -109,9 +99,6 @@ class eZTextType extends eZDataType
             return eZInputValidator::STATE_INVALID;
     }
 
-    /*!
-     Fetches the http post var string input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_text_" . $contentObjectAttribute->attribute( "id" ) ) )
@@ -123,9 +110,6 @@ class eZTextType extends eZDataType
         return false;
     }
 
-    /*!
-     Fetches the http post variables for collected information
-    */
     function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_text_" . $contentObjectAttribute->attribute( "id" ) ) )
@@ -137,24 +121,15 @@ class eZTextType extends eZDataType
         return false;
     }
 
-    /*!
-     Store the content.
-    */
     function storeObjectAttribute( $attribute )
     {
     }
 
-    /*!
-     Simple string insertion is supported.
-    */
     function isSimpleStringInsertionSupported()
     {
         return true;
     }
 
-    /*!
-     Inserts the string \a $string in the \c 'data_text' database field.
-    */
     function insertSimpleString( $object, $objectVersion, $objectLanguage,
                                  $objectAttribute, $string,
                                  &$result )
@@ -166,9 +141,10 @@ class eZTextType extends eZDataType
         return true;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return string
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( "data_text" );
@@ -186,18 +162,11 @@ class eZTextType extends eZDataType
         return false;
     }
 
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
     function metaData( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( "data_text" );
     }
 
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
-
-    */
     function toString( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_text' );
@@ -213,9 +182,6 @@ class eZTextType extends eZDataType
         return trim( $contentObjectAttribute->attribute( 'data_text' ) ) != '';
     }
 
-    /*!
-     Returns the text.
-    */
     function title( $data_instance, $name = null )
     {
         return $data_instance->attribute( "data_text" );

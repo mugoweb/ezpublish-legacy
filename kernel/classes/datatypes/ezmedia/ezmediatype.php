@@ -8,13 +8,11 @@
  * @package kernel
  */
 
-/*!
-  \class eZMediaType ezmediatype.php
-  \ingroup eZDatatype
-  \brief The class eZMediaType handles storage and playback of media files.
-
-*/
-
+/**
+ * The class eZMediaType handles storage and playback of media files.
+ *
+ * @package kernel
+ */
 class eZMediaType extends eZDataType
 {
     const DATA_TYPE_STRING = "ezmedia";
@@ -63,10 +61,6 @@ class eZMediaType extends eZDataType
         }
     }
 
-    /*!
-     The object is being moved to trash, do any necessary changes to the attribute.
-     Rename file and update db row with new name, so that access to the file using old links no longer works.
-    */
     function trashStoredObjectAttribute( $contentObjectAttribute, $version = null )
     {
         $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
@@ -115,9 +109,6 @@ class eZMediaType extends eZDataType
         }
     }
 
-    /*!
-     Delete stored attribute
-    */
     function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
     {
         $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
@@ -171,10 +162,6 @@ class eZMediaType extends eZDataType
         eZMedia::removeByID( $contentObjectAttributeID, $version );
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -237,9 +224,6 @@ class eZMediaType extends eZDataType
         return eZInputValidator::STATE_ACCEPTED;
     }
 
-    /*!
-     Checks if file uploads are enabled, if not it gives a warning.
-    */
     function checkFileUploads()
     {
         $isFileUploadsEnabled = ini_get( 'file_uploads' ) != 0;
@@ -256,11 +240,12 @@ class eZMediaType extends eZDataType
         }
     }
 
-    /*!
-     \static
-     Returns plugin page by media type
-
-    */
+    /**
+     * Returns plugin page by media type
+     *
+     * @param string $mediaType
+     * @return string
+     */
     function pluginPage( $mediaType )
     {
         $pluginPage = '';
@@ -289,9 +274,6 @@ class eZMediaType extends eZDataType
         return $pluginPage;
     }
 
-    /*!
-     Fetches input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
 
@@ -402,25 +384,16 @@ class eZMediaType extends eZDataType
         }
     }
 
-    /*!
-     HTTP file insertion is supported.
-    */
     function isHTTPFileInsertionSupported()
     {
         return true;
     }
 
-    /*!
-     Regular file insertion is supported.
-    */
     function isRegularFileInsertionSupported()
     {
         return true;
     }
 
-    /*!
-     Inserts the file using the eZMedia class.
-    */
     function insertHTTPFile( $object, $objectVersion, $objectLanguage,
                              $objectAttribute, $httpFile, $mimeData,
                              &$result )
@@ -479,16 +452,12 @@ class eZMediaType extends eZDataType
         $fileHandler = eZClusterFileHandler::instance();
         $fileHandler->fileStore( $filePath, 'mediafile', true, $mimeData['name'] );
 
-
         $media->store();
 
         $objectAttribute->setContent( $media );
         return true;
     }
 
-    /*!
-     Inserts the file using the eZMedia class.
-    */
     function insertRegularFile( $object, $objectVersion, $objectLanguage,
                                 $objectAttribute, $filePath,
                                 &$result )
@@ -571,18 +540,12 @@ class eZMediaType extends eZDataType
         return true;
     }
 
-    /*!
-      We support file information
-    */
     function hasStoredFileInformation( $object, $objectVersion, $objectLanguage,
                                        $objectAttribute )
     {
         return true;
     }
 
-    /*!
-      Extracts file information for the media entry.
-    */
     function storedFileInformation( $object, $objectVersion, $objectLanguage,
                                     $objectAttribute )
     {
@@ -628,9 +591,6 @@ class eZMediaType extends eZDataType
         }
     }
 
-    /*!
-     Returns the object title.
-    */
     function title( $contentObjectAttribute,  $name = "original_filename" )
     {
         $mediaFile = eZMedia::fetch( $contentObjectAttribute->attribute( "id" ),
@@ -654,6 +614,10 @@ class eZMediaType extends eZDataType
        return true;
     }
 
+    /**
+     * @inheritdoc
+     * @return eZMedia
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         $mediaFile = eZMedia::fetch( $contentObjectAttribute->attribute( "id" ),
@@ -666,14 +630,15 @@ class eZMediaType extends eZDataType
         return $mediaFile;
     }
 
+    /**
+     * @inheritdoc
+     * @return string
+     */
     function metaData( $contentObjectAttribute )
     {
         return "";
     }
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
 
-    */
     function toString( $objectAttribute )
     {
         $mediaFile = $objectAttribute->content();
@@ -685,8 +650,6 @@ class eZMediaType extends eZDataType
         else
             return '';
     }
-
-
 
     function fromString( $objectAttribute, $string )
     {
@@ -722,6 +685,7 @@ class eZMediaType extends eZDataType
 
     function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
+        /** @var DOMElement $sizeNode */
         $sizeNode = $attributeParametersNode->getElementsByTagName( 'max-size' )->item( 0 );
         $maxSize = $sizeNode->textContent;
         $unitSize = $sizeNode->getAttribute( 'unit-size' );
@@ -771,6 +735,7 @@ class eZMediaType extends eZDataType
 
     function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
     {
+        /** @var DOMElement $mediaNode */
         $mediaNode = $attributeNode->getElementsByTagName( 'media-file' )->item( 0 );
         if ( !$mediaNode )
         {

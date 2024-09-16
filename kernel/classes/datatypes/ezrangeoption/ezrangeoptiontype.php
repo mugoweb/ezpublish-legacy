@@ -65,8 +65,6 @@ class eZRangeOptionType extends eZDataType
         {
             return eZInputValidator::STATE_ACCEPTED;
         }
-
-
     }
 
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
@@ -101,10 +99,15 @@ class eZRangeOptionType extends eZDataType
 
     function storeObjectAttribute( $contentObjectAttribute )
     {
+        /** @var eZRangeOption $option */
         $option = $contentObjectAttribute->content();
         $contentObjectAttribute->setAttribute( "data_text", $option->xmlString() );
     }
 
+    /**
+     * @inheritdoc
+     * @return eZRangeOption
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         $option = new eZRangeOption( "" );
@@ -125,7 +128,6 @@ class eZRangeOptionType extends eZDataType
         return implode( '|', $optionArray );
     }
 
-
     function fromString( $contentObjectAttribute, $string )
     {
         if ( $string == '' )
@@ -140,16 +142,12 @@ class eZRangeOptionType extends eZDataType
         $option->StopValue = array_shift( $optionArray );
         $option->StepValue = array_shift( $optionArray );
 
-
         $contentObjectAttribute->setAttribute( "data_text", $option->xmlString() );
 
         return $option;
 
     }
-    /*!
-     Finds the option which has the ID that matches \a $optionID, if found it returns
-     an option structure.
-    */
+
     function productOptionInformation( $objectAttribute, $optionID, $productItem )
     {
         $option = $objectAttribute->attribute( 'content' );
@@ -183,13 +181,11 @@ class eZRangeOptionType extends eZDataType
         return true;
     }
 
-    /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion == false )
         {
+            /** @var eZRangeOption $option */
             $option = $contentObjectAttribute->content();
             $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
             if ( !$option )

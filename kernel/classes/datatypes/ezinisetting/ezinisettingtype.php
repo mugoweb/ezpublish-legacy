@@ -8,16 +8,13 @@
  * @package kernel
  */
 
-/*!
-  \class eZIniSettingType ezinisettingtype.php
-  \ingroup eZDatatype
-  \brief A content datatype for setting ini file settings
-
-  Enable editing and versioning of ini files from the admin interface
-*/
-
-
-
+/**
+ * A content datatype for setting ini file settings
+ *
+ * Enable editing and versioning of ini files from the admin interface
+ *
+ * @package kernel
+ */
 class eZIniSettingType extends eZDataType
 {
     const DATA_TYPE_STRING = 'ezinisetting';
@@ -309,15 +306,14 @@ class eZIniSettingType extends eZDataType
         }
     }
 
-    /*!
-     \private
-     Parse array input text into array with korrect keys.
-
-     \param input text
-     \param array to store parsed file to
-
-     \return true if parsed successfully, false if illegal syntax
-    */
+    /**
+     * Parse array input text into array with korrect keys.
+     *
+     * @param string $inputText
+     * @param array $outputArray array to store parsed file to
+     * @param bool $makeEmptyArray
+     * @return bool true if parsed successfully, false if illegal syntax
+     */
     function parseArrayInput( $inputText, &$outputArray, $makeEmptyArray = false )
     {
         $lineArray = explode( "\n", $inputText );
@@ -355,6 +351,10 @@ class eZIniSettingType extends eZDataType
         return true;
     }
 
+    /**
+     * @inheritdoc
+     * @return array
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         $contentClassAttribute = $contentObjectAttribute->attribute( 'contentclass_attribute' );
@@ -446,10 +446,6 @@ class eZIniSettingType extends eZDataType
         $attributeParametersNode->appendChild( $siteAccessListNode );
     }
 
-    /*!
-
-     Use Override to do ini alterations if the specified site access does not exist
-    */
     function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
         $file = $attributeParametersNode->getElementsByTagName( 'file' )->item( 0 )->textContent;
@@ -461,7 +457,6 @@ class eZIniSettingType extends eZDataType
         $classAttribute->setAttribute( self::CLASS_SECTION_FIELD, $section );
         $classAttribute->setAttribute( self::CLASS_PARAMETER_FIELD, $parameter );
         $classAttribute->setAttribute( self::CLASS_TYPE_FIELD, $type );
-
 
         /* Get and check if site access settings exist in this setup */
         $remoteIniInstanceList = $attributeParametersNode->getElementsByTagName( 'ini_instance' )->item( 0 )->textContent;
@@ -506,47 +501,44 @@ class eZIniSettingType extends eZDataType
         $classAttribute->setAttribute( self::SITE_ACCESS_LIST_FIELD, $siteAccess );
     }
 
-
-    /*!
-     \private
-     Get Ini section parameter name
-
-     \param Content Class Attribute
-    */
+    /**
+     * Returns the ini section parameter name
+     *
+     * @param eZContentClassAttribute $contentClassAttribute
+     * @return string
+     */
     function iniParameterName( $contentClassAttribute )
     {
         return $contentClassAttribute->attribute( self::CLASS_PARAMETER_FIELD );
     }
 
-    /*!
-     \private
-     Get ini settings file
-
-     \param Content Class Attribute
-    */
+    /**
+     * Returns the ini settings file name
+     *
+     * @param eZContentClassAttribute $contentClassAttribute
+     * @return mixed
+     */
     function iniFile( $contentClassAttribute )
     {
         return $contentClassAttribute->attribute( self::CLASS_FILE_FIELD );
     }
 
-    /*!
-     \private
-     Get Ini file section name
-
-     \param Content Class Attribute
-    */
+    /**
+     * Returns the ini file section name
+     *
+     * @param eZContentClassAttribute $contentClassAttribute
+     * @return string
+     */
     function iniSection( $contentClassAttribute )
     {
         return $contentClassAttribute->attribute( self::CLASS_SECTION_FIELD );
     }
 
-    /*!
-     \private
-     \static
-     Set site access list, including override option
-
-     \param contentClassAttribute to set site access list and override options
-    */
+    /**
+     * Sets site access list, including override option
+     *
+     * @param eZContentClassAttribute $contentClassAttribute
+     */
     function setSiteAccessList( $contentClassAttribute )
     {
         $config = eZINI::instance( 'site.ini' );
@@ -566,7 +558,6 @@ class eZIniSettingType extends eZDataType
         $value = $contentObjectAttribute->attribute( 'data_text' );
         return implode( '|', array( $value, $makeEmptyArray ) );
     }
-
 
     function fromString( $contentObjectAttribute, $string )
     {

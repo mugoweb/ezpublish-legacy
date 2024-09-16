@@ -33,10 +33,6 @@ class eZBooleanType extends eZDataType
     {
     }
 
-
-   /*!
-     Sets the default value.
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -52,9 +48,6 @@ class eZBooleanType extends eZDataType
         }
     }
 
-    /*!
-      Validates the http post var boolean input.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -96,9 +89,6 @@ class eZBooleanType extends eZDataType
         }
     }
 
-    /*!
-     Fetches the http post var boolean input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_boolean_" . $contentObjectAttribute->attribute( "id" ) ))
@@ -122,9 +112,6 @@ class eZBooleanType extends eZDataType
         return true;
     }
 
-   /*!
-    Fetches the http post variables for collected information
-   */
     function fetchCollectionAttributeHTTPInput( $collection, $collectionAttribute, $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_boolean_" . $contentObjectAttribute->attribute( "id" ) ))
@@ -166,10 +153,7 @@ class eZBooleanType extends eZDataType
     {
         return $contentObjectAttribute->attribute( "data_int" );
     }
-    /*!
-     \return string representation of an contentobjectattribute data for simplified export
 
-    */
     function toString( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( 'data_int' );
@@ -200,17 +184,11 @@ class eZBooleanType extends eZDataType
         return 'int';
     }
 
-    /*!
-     Returns the content.
-    */
     function objectAttributeContent( $contentObjectAttribute )
     {
         return $contentObjectAttribute->attribute( "data_int" );
     }
 
-    /*!
-     Returns the integer value.
-    */
     function title( $contentObjectAttribute, $name = null )
     {
         return $contentObjectAttribute->attribute( "data_int" );

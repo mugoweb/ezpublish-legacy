@@ -26,9 +26,6 @@ class eZUserType extends eZDataType
                                   'serialize_supported' => true ) );
     }
 
-    /*!
-     Delete stored object attribute
-    */
     function deleteStoredObjectAttribute( $contentObjectAttribute, $version = null )
     {
         $db = eZDB::instance();
@@ -45,10 +42,6 @@ class eZUserType extends eZDataType
         }
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_user_login_" . $contentObjectAttribute->attribute( "id" ) ) &&
@@ -173,9 +166,6 @@ class eZUserType extends eZDataType
         return eZInputValidator::STATE_ACCEPTED;
     }
 
-    /*!
-     Fetches the http post var integer input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         if ( $http->hasPostVariable( $base . "_data_user_login_" . $contentObjectAttribute->attribute( "id" ) ) )
@@ -346,9 +336,6 @@ class eZUserType extends eZDataType
         return $user;
     }
 
-    /*!
-     Returns the object title.
-    */
     function title( $contentObjectAttribute, $name = "login" )
     {
         $user = $this->objectAttributeContent( $contentObjectAttribute );
@@ -367,9 +354,10 @@ class eZUserType extends eZDataType
         return false;
     }
 
-    /*!
-     Returns the user object.
-    */
+    /**
+     * @inheritdoc
+     * @return eZUser
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         $userID = $contentObjectAttribute->attribute( "contentobject_id" );
@@ -397,11 +385,15 @@ class eZUserType extends eZDataType
         return true;
     }
 
-    /*!
-     We can only remove the user attribute if:
-     - The current user, anonymous user and administrator user is not using this class
-     - There are more classes with the ezuser datatype
-    */
+    /**
+     * We can only remove the user attribute if:
+     * - The current user, anonymous user and administrator user is not using this class
+     * - There are more classes with the ezuser datatype
+     *
+     * @param eZContentClassAttribute $contentClassAttribute
+     * @param bool $includeAll
+     * @return array|bool
+     */
     function classAttributeRemovableInformation( $contentClassAttribute, $includeAll = true )
     {
         $result  = array( 'text' => ezpI18n::tr( 'kernel/classes/datatypes',
@@ -461,9 +453,6 @@ class eZUserType extends eZDataType
         return $result;
     }
 
-    /*!
-     Returns the meta data used for storing search indeces.
-    */
     function metaData( $contentObjectAttribute )
     {
         $metaString = "";
@@ -505,7 +494,8 @@ class eZUserType extends eZDataType
      * </code>
      *
      * @uses eZUser::isEnabled()
-     * @param object $contentObjectAttribute A contentobject attribute of type user_account.
+     *
+     * @param eZContentObjectAttribute $contentObjectAttribute A contentobject attribute of type user_account.
      * @return string The string definition.
      */
     function toString( $contentObjectAttribute )
@@ -515,6 +505,7 @@ class eZUserType extends eZDataType
         {
             $GLOBALS['eZUserObject_' . $userID] = eZUser::fetch( $userID );
         }
+        /** @var eZUser $user */
         $user = $GLOBALS['eZUserObject_' . $userID];
 
         $userInfo = array(
@@ -540,9 +531,9 @@ class eZUserType extends eZDataType
      * foo|foo@ez.no|1234|md5_password|0
      * </code>
      *
-     * @param object $contentObjectAttribute A contentobject attribute of type user_account.
+     * @param eZContentObjectAttribute $contentObjectAttribute A contentobject attribute of type user_account.
      * @param string $string The string as described in the example.
-     * @return object The newly created eZUser object
+     * @return eZUser The newly created eZUser object
      */
     function fromString( $contentObjectAttribute, $string )
     {
@@ -588,12 +579,6 @@ class eZUserType extends eZDataType
         return $user;
     }
 
-    /*!
-     \param package
-     \param content attribute
-
-     \return a DOM representation of the content object attribute
-    */
     function serializeContentObjectAttribute( $package, $objectAttribute )
     {
         $node = $this->createContentObjectAttributeDOMNode( $objectAttribute );
@@ -613,11 +598,6 @@ class eZUserType extends eZDataType
         return $node;
     }
 
-    /*!
-     \param package
-     \param contentobject attribute object
-     \param ezdomnode object
-    */
     function unserializeContentObjectAttribute( $package, $objectAttribute, $attributeNode )
     {
         $userNode = $attributeNode->getElementsByTagName( 'account' )->item( 0 );

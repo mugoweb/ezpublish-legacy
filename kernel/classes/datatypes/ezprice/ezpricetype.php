@@ -8,13 +8,11 @@
  * @package kernel
  */
 
-/*!
-  \class eZPriceType ezpricetype.php
-  \ingroup eZDatatype
-  \brief Stores a price (float)
-
-*/
-
+/**
+ * Stores an eZPrice object
+ *
+ * @package kernel
+ */
 class eZPriceType extends eZDataType
 {
     const DATA_TYPE_STRING = "ezprice";
@@ -32,10 +30,6 @@ class eZPriceType extends eZDataType
                                   'object_serialize_map' => array( 'data_float' => 'price' ) ) );
     }
 
-    /*!
-     Validates the input and returns true if the input was
-     valid for this datatype.
-    */
     function validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         // Check "price inc/ex VAT" and "VAT type" fields.
@@ -87,9 +81,6 @@ class eZPriceType extends eZDataType
         return $contentObjectAttribute->attribute( "data_float" );
     }
 
-    /*!
-     reimp
-    */
     function initializeObjectAttribute( $contentObjectAttribute, $currentVersion, $originalContentObjectAttribute )
     {
         if ( $currentVersion != false )
@@ -101,15 +92,13 @@ class eZPriceType extends eZDataType
         }
     }
 
-    /*!
-     Set default class attribute value
-    */
     function initializeClassAttribute( $classAttribute )
     {
         if ( $classAttribute->attribute( self::INCLUDE_VAT_FIELD ) == 0 )
             $classAttribute->setAttribute( self::INCLUDE_VAT_FIELD, self::INCLUDED_VAT );
         $classAttribute->store();
     }
+
     function fetchClassAttributeHTTPInput( $http, $base, $classAttribute )
     {
         $isVatIncludedVariable = $base . self::INCLUDE_VAT_VARIABLE . $classAttribute->attribute( 'id' );
@@ -127,9 +116,6 @@ class eZPriceType extends eZDataType
         return true;
     }
 
-    /*!
-     Fetches the http post var integer input and stores it in the data instance.
-    */
     function fetchObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute )
     {
         $data = $http->postVariable( $base . "_data_price_" . $contentObjectAttribute->attribute( "id" ) );
@@ -147,9 +133,10 @@ class eZPriceType extends eZDataType
         return true;
     }
 
-    /*!
-     Returns the content.
-    */
+    /**
+     * @inheritdoc
+     * @return eZPrice
+     */
     function objectAttributeContent( $contentObjectAttribute )
     {
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
@@ -167,9 +154,10 @@ class eZPriceType extends eZDataType
         return $price;
     }
 
-    /*!
-     Returns class content.
-    */
+    /**
+     * @inheritdoc
+     * @return eZPrice
+     */
     function classAttributeContent( $classAttribute )
     {
         $contentObjectAttribute = false;
@@ -177,14 +165,6 @@ class eZPriceType extends eZDataType
         return $price;
     }
 
-    /**
-     * Return content action(s) which can be performed on object containing
-     * the current datatype. Return format is array of arrays with key 'name'
-     * and 'action'. 'action' can be mapped to url in datatype.ini
-     *
-     * @param eZContentClassAttribute $classAttribute
-     * @return array
-    */
     function contentActionList( $classAttribute )
     {
         $actionList = parent::contentActionList( $classAttribute );
@@ -222,12 +202,12 @@ class eZPriceType extends eZDataType
     {
 
         $price = $contentObjectAttribute->attribute( 'content' );
+        /** @var eZVatType $vatType */
         $vatType =$price->attribute( 'selected_vat_type' );
 
         $priceStr = implode( '|', array( $price->attribute( 'price' ), $vatType->attribute( 'id' ) , ($price->attribute( 'is_vat_included' ) )? 1:0 ) );
         return $priceStr;
     }
-
 
     function fromString( $contentObjectAttribute, $string )
     {
@@ -249,10 +229,12 @@ class eZPriceType extends eZDataType
 
     function serializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
+        /** @var eZPrice $price */
         $price = $classAttribute->content();
         if ( $price )
         {
             $vatIncluded = $price->attribute( 'is_vat_included' );
+            /** @var eZVatType[] $vatTypes */
             $vatTypes = $price->attribute( 'vat_type' );
 
             $dom = $attributeParametersNode->ownerDocument;
@@ -280,6 +262,7 @@ class eZPriceType extends eZDataType
 
     function unserializeContentClassAttribute( $classAttribute, $attributeNode, $attributeParametersNode )
     {
+        /** @var DOMElement $vatNode */
         $vatNode = $attributeParametersNode->getElementsByTagName( 'vat-included' )->item( 0 );
         $vatIncluded = strtolower( $vatNode->getAttribute( 'is-set' ) ) == 'true';
         if ( $vatIncluded )
@@ -288,6 +271,7 @@ class eZPriceType extends eZDataType
             $vatIncluded = self::EXCLUDED_VAT;
 
         $classAttribute->setAttribute( self::INCLUDE_VAT_FIELD, $vatIncluded );
+        /** @var DOMElement $vatTypeNode */
         $vatTypeNode = $attributeParametersNode->getElementsByTagName( 'vat-type' )->item( 0 );
         $vatName = $vatTypeNode->getAttribute( 'name' );
         $vatPercentage = $vatTypeNode->getAttribute( 'percentage' );
