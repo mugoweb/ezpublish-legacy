@@ -971,7 +971,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
         $return = $this->_protect( array( $this, '_storeInner' ), $fname,
                          $filePath, $datatype, $scope, $fname );
 
-        $this->eventHandler->notify( 'cluster/deleteFile', array( $filePath ) );
+        $this->eventHandler->notify( 'cluster/storeFile', array( $filePath, $datatype, $scope ) );
 
         return $return;
     }
@@ -2006,6 +2006,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
             'cluster/storeMetadata',
             'cluster/loadMetadata',
             'cluster/fileExists',
+            'cluster/storeFile',
             'cluster/deleteFile',
             'cluster/deleteByLike',
             'cluster/deleteByDirList',
