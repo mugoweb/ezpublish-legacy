@@ -1,4 +1,9 @@
 <?php
+
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+
 /**
  * File containing the eZSMTPTransport class.
  *
@@ -19,20 +24,6 @@ class eZSMTPTransport extends eZMailTransport
     function sendMail( eZMail $mail )
     {
         $ini = eZINI::instance();
-        $parameters = array();
-        $parameters['host'] = $ini->variable( 'MailSettings', 'TransportServer' );
-        $parameters['helo'] = $ini->variable( 'MailSettings', 'SenderHost' );
-        $parameters['port'] = $ini->variable( 'MailSettings', 'TransportPort' );
-        $parameters['connectionType'] = $ini->variable( 'MailSettings', 'TransportConnectionType' );
-        $user = $ini->variable( 'MailSettings', 'TransportUser' );
-        $password = $ini->variable( 'MailSettings', 'TransportPassword' );
-        if ( $user and
-             $password )
-        {
-            $parameters['auth'] = true;
-            $parameters['user'] = $user;
-            $parameters['pass'] = $password;
-        }
 
         /* If email sender hasn't been specified or is empty
          * we substitute it with either MailSettings.EmailSender or AdminEmail.
@@ -41,52 +32,102 @@ class eZSMTPTransport extends eZMailTransport
         {
             $emailSender = $ini->variable( 'MailSettings', 'EmailSender' );
             if ( !$emailSender )
+            {
                 $emailSender = $ini->variable( 'MailSettings', 'AdminEmail' );
+            }
 
             eZMail::extractEmail( $emailSender, $emailSenderAddress, $emailSenderName );
 
             if ( !eZMail::validate( $emailSenderAddress ) )
+            {
                 $emailSender = false;
+            }
 
             if ( $emailSender )
+            {
                 $mail->setSenderText( $emailSender );
+            }
         }
 
         $excludeHeaders = $ini->variable( 'MailSettings', 'ExcludeHeaders' );
         if ( count( $excludeHeaders ) > 0 )
-            $mail->Mail->appendExcludeHeaders( $excludeHeaders );
-
-        $options = new ezcMailSmtpTransportOptions();
-        if( $parameters['connectionType'] )
         {
-            $options->connectionType = $parameters['connectionType'];
+            $currentHeader = $mail->Mail->getHeaders();
+            foreach( $excludeHeaders as $headerName )
+            {
+                $currentHeader->remove( $headerName );
+            }
         }
-        $smtp = new ezcMailSmtpTransport( $parameters['host'], $user, $password,
-        $parameters['port'], $options );
 
         // If in debug mode, send to debug email address and nothing else
         if ( $ini->variable( 'MailSettings', 'DebugSending' ) == 'enabled' )
         {
-            $mail->Mail->to = array( new ezcMailAddress( $ini->variable( 'MailSettings', 'DebugReceiverEmail' ) ) );
-            $mail->Mail->cc = array();
-            $mail->Mail->bcc = array();
+            $mail->setReceiver(
+                $ini->variable( 'MailSettings', 'DebugReceiverEmail' )
+            );
+            $mail->setCcElements( [] );
+            $mail->setBccElements( [] );
         }
 
-        // send() from ezcMailSmtpTransport doesn't return anything (it uses exceptions in case
-        // something goes bad)
+        $transport = Transport::fromDsn( self::generateDsn() );
+        $mailer = new Mailer( $transport );
+
         try
         {
-            $smtp->send( $mail->Mail );
+            $mailer->send( $mail->Mail );
+            return true;
         }
-        catch ( ezcMailException $e )
+        catch ( TransportExceptionInterface $e )
         {
             eZDebug::writeError( $e->getMessage(), __METHOD__ );
             return false;
         }
+    }
 
-        // return true in case of no exceptions
-        return true;
+    /**
+     * @return string
+     */
+    static protected function generateDsn()
+    {
+        $ini = eZINI::instance();
+
+        $scheme = 'smtp';
+        $encryption = $ini->variable( 'MailSettings', 'TransportConnectionType' );
+        if( $encryption )
+        {
+            $scheme = 'smtps';
+        }
+
+        $user = $ini->variable( 'MailSettings', 'TransportUser' );
+        $password = $ini->variable( 'MailSettings', 'TransportPassword' );
+        $port = $ini->variable( 'MailSettings', 'TransportPort' );
+
+        // Build options array
+        $options = [
+            'verify_peer' => 0,
+        ];
+
+        $localDomain = $ini->variable( 'MailSettings', 'SenderHost' );
+        if( $localDomain )
+        {
+            $options[ 'local_domain' ] = $localDomain;
+        }
+
+        //Example smtp://user:pass@smtp.example.com:port?encryption=tls
+        $dsn =
+            $scheme . '://' .
+            ( $user ? rawurlencode( $user ) : '' ) .
+            ( $password ? ':' . rawurlencode( $password ) : '' ) .
+            ( $ini->variable( 'MailSettings', 'TransportServer' ) ).
+            ( $port ? ':' . $port : '' );
+
+        if( !empty( $options ) )
+        {
+            $dsn .= '?' . http_build_query( $options );
+        }
+
+        return $dsn;
     }
 }
 
-?>
+

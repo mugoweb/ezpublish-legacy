@@ -1,60 +1,7 @@
 <?php
-//
-// $Id: ezmail.php,v 1.44.2.7 2002/06/10 16:41:45 fh Exp $
-/**
- * File containing the eZMail class.
- *
- * @copyright Copyright (C) eZ Systems AS. All rights reserved.
- * @license For full copyright and license information view LICENSE file distributed with this source code.
- * @version //autogentag//
- * @package lib
- */
 
-/*! \defgroup eZUtils Utility classes */
-
-/*!
-  \class eZMail ezmail.php
-  \ingroup eZUtils
-  \brief Mail handler
-
-  Class for storing the details about en email and providing
-  text serialization.
-
- \note It's important to note that most methods that return values do an automatic conversion if not specified.
-
-  This class will be deprecated in the next eZ Publish release, and replaced with ezcMail from eZ Components.
-
-  The eZMail class was used like this (with old smtp class which will be removed):
-    $mail = new eZMail();
-    $mail->setSender( $fromEmail, $yourName );
-    $mail->setReceiver( $receiversEmail, $receiversName );
-    $mail->setSubject( $subject );
-
-    $smtp = new smtp( $parameters );
-    $smtpConnected = $smtp->connect();
-    if ( $smtpConnected )
-    {
-        $result = $smtp->send( $sendData );
-    }
-
-  Since the smtp class will be removed, ezcMailSmtpTransport from eZ
-  Components can be used temporarily instead (the class eZSMTPTransport
-  is using ezcMailSmtpTransport instead of smtp as well):
-
-    $smtp = new ezcMailSmtpTransport( $host, $username, $password, $port );
-    $smtp->send( $mail->Mail );
-
-  Instead of the code above, ezcMail will be used together with the SMTP
-  transport from eZ Components (MTA transport will work as well):
-
-    $mail = new ezpMail();
-    $mail->from = new ezcMailAddress( $fromEmail, $yourName, $charset );
-    $mail->addTo( new ezcMailAddress( $receiversEmail, $receiversName, $charset ) );
-    $mail->subject = $subject;
-
-    $smtp = new ezcMailSmtpTransport( $host, $username, $password, $port );
-    $smtp->send( $mail );
-*/
+use Symfony\Component\Mime\Email;
+use Symfony\Component\Mime\Address;
 
 class eZMail
 {
@@ -63,7 +10,7 @@ class eZMail
 
     public function __construct()
     {
-        $this->Mail = new ezpMail();
+        $this->Mail = new Email();
 
         $this->ReceiverElements = array();
         $this->From = false;
@@ -315,7 +262,7 @@ class eZMail
     */
     function contentCharset()
     {
-        return $this->ContentType['charset'];
+        return $this->ContentType[ 'charset' ] ?? null;
     }
 
     /*!
@@ -361,7 +308,10 @@ class eZMail
     */
     function setMIMEVersion( $version )
     {
-        $this->Mail->setHeader( 'MIME-Version', $version );
+		$headers = $this->Mail->getHeaders();
+		$headers->addHeader( 'MIME-Version', $version );
+		$this->Mail->setHeaders( $headers );
+
         $this->MIMEVersion = $version;
     }
 
@@ -369,6 +319,7 @@ class eZMail
      Sets the various content variables, any parameter which is set to something other than \c false
      will overwrite the old value.
 
+     It is mainly used to choose between text/plain and text/html email bodies.
       \deprecated
     */
     function setContentType( $type = false, $charset = false,
@@ -387,15 +338,10 @@ class eZMail
         if ( $boundary )
             $this->ContentType['boundary'] = $boundary;
 
-        // if the body was already defined
-        if ( $this->Mail->body instanceof ezcMailText )
+        // if the body was already defined - set it again with to respect new content type
+        if( $this->BodyText )
         {
-            // if the content-type is in the form of e.g. 'text/plain'
-            if ( strpos( $this->ContentType['type'] ,'/' ) !== false )
-            {
-                list( $type, $subType ) = explode( '/', $this->ContentType['type'] );
-                $this->Mail->body->subType = $subType;
-            }
+            $this->setBody( $this->BodyText );
         }
     }
 
@@ -406,7 +352,10 @@ class eZMail
     */
     function setUserAgent( $agent )
     {
-        $this->Mail->setHeader( 'User-Agent', $agent );
+    	$headers = $this->Mail->getHeaders();
+    	$headers->addHeader( 'User-Agent', $agent );
+        $this->Mail->setHeaders( $headers );
+
         $this->UserAgent = $agent;
     }
 
@@ -417,13 +366,21 @@ class eZMail
     */
     function setReceiverElements( $toElements )
     {
-        $this->Mail->to = array();
-        foreach ( $toElements as $address )
+        $replace = true;
+        foreach ( $toElements as $index => $toElement )
         {
-            $name = isset( $address['name'] ) ? $address['name'] : false;
-            $this->Mail->addTo( new ezcMailAddress( $address['email'], $name, $this->usedCharset() ) );
+            $name = isset( $toElement[ 'name' ] ) ? $toElement[ 'name' ] : '';
+
+            if( $replace )
+            {
+                $replace = false;
+                $this->setReceiver( $toElement[ 'email' ], $name );
+            }
+            else
+            {
+                $this->addReceiver( $toElement[ 'email' ], $name );
+            }
         }
-        $this->ReceiverElements = $toElements;
     }
 
     /*!
@@ -435,9 +392,22 @@ class eZMail
     */
     function setReceiver( $email, $name = false )
     {
-        $this->Mail->to = array( new ezcMailAddress( $email, $name, $this->usedCharset() ) );
-        $this->ReceiverElements = array( array( 'name' => $name,
-                                                'email' => $email ) );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $toAddress = new Address( $email, $name );
+            $this->Mail->to( $toAddress );
+
+            $this->ReceiverElements = array( array(
+                'name' => $name,
+                'email' => $email
+            ) );
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -450,9 +420,7 @@ class eZMail
     function setReceiverText( $text )
     {
         $this->extractEmail( $text, $email, $name );
-        $this->Mail->to = array( new ezcMailAddress( $email, $name, $this->usedCharset() ) );
-        $this->ReceiverElements = array( array( 'name' => $name,
-                                                'email' => $email ) );
+        $this->setReceiver( $email, $name );
     }
 
     /*!
@@ -462,9 +430,24 @@ class eZMail
     */
     function addReceiver( $email, $name = false )
     {
-        $this->Mail->addTo( new ezcMailAddress( $email, $name, $this->usedCharset() ) );
-        $this->ReceiverElements[] = array( 'name' => $name,
-                                           'email' => $email );
+        // change default value
+        $name = $name ? $name : '';
+
+        try
+        {
+            $toAddress = new Address( $email, $name );
+            $this->Mail->addTo( $toAddress );
+
+            $this->ReceiverElements[] =
+                [
+                    'name' => $name,
+                    'email' => $email
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -474,9 +457,22 @@ class eZMail
     */
     function setReplyTo( $email, $name = false )
     {
-        $this->Mail->setHeader( 'Reply-To', new ezcMailAddress( $email, $name, $this->usedCharset() ) );
-        $this->ReplyTo = array( 'name' => $name,
-                                'email' => $email );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->addReplyTo( $address );
+
+            $this->ReplyTo = array(
+                'name' => $name,
+                'email' => $email
+            );
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -486,9 +482,22 @@ class eZMail
     */
     function setSender( $email, $name = false )
     {
-        $this->Mail->from = new ezcMailAddress( $email, $name, $this->usedCharset() );
-        $this->From = array( 'name' => $name,
-                             'email' => $email );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->sender( $address );
+
+            $this->From = array(
+                'name' => $name,
+                'email' => $email
+            );
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -499,9 +508,8 @@ class eZMail
     function setSenderText( $text )
     {
         $this->extractEmail( $text, $email, $name );
-        $this->Mail->from = new ezcMailAddress( $email, $name, $this->usedCharset() );
-        $this->From = array( 'name' => $name,
-                             'email' => $email );
+
+        $this->setSender( $email, $name );
     }
 
     /*!
@@ -511,13 +519,55 @@ class eZMail
      */
     function setCcElements( $newCc )
     {
-        $this->Mail->cc = array();
-        foreach ( $newCc as $address )
+        $replace = true;
+
+        if( !empty( $newCc ) )
         {
-            $name = isset( $address['name'] ) ? $address['name'] : false;
-            $this->Mail->addCc( new ezcMailAddress( $address['email'], $name, $this->usedCharset() ) );
+            foreach ( $newCc as $element )
+            {
+                $name = isset( $element[ 'name' ] ) ? $element[ 'name' ] : '';
+
+                if( $replace )
+                {
+                    $replace = false;
+                    $this->setCc( $element[ 'email' ], $name );
+                }
+                else
+                {
+                    $this->addCc( $element[ 'email' ], $name );
+                }
+            }
         }
-        $this->CcElements = $newCc;
+        else
+        {
+            $headers = $this->Mail->getHeaders();
+            $headers->remove( 'cc' );
+
+            $this->CcElements = [];
+        }
+    }
+
+    function setCc( $email, $name = false )
+    {
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->cc( $address );
+
+            $this->CcElements =
+                [
+                    [
+                        'name' => $name,
+                        'email' => $email,
+                    ]
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -527,9 +577,23 @@ class eZMail
     */
     function addCc( $email, $name = false )
     {
-        $this->Mail->addCc( new ezcMailAddress( $email, $name, $this->usedCharset() ) );
-        $this->CcElements[] = array( 'name' => $name,
-                                     'email' => $email );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->addCc( $address );
+
+            $this->CcElements[] =
+                [
+                    'name' => $name,
+                    'email' => $email,
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -539,13 +603,54 @@ class eZMail
      */
     function setBccElements( $newBcc )
     {
-        $this->Mail->bcc = array();
-        foreach ( $newBcc as $address )
+        $replace = true;
+        if( !empty( $newBcc ) )
         {
-            $name = isset( $address['name'] ) ? $address['name'] : false;
-            $this->Mail->addBcc( new ezcMailAddress( $address['email'], $name, $this->usedCharset() ) );
+            foreach ( $newBcc as $element )
+            {
+                $name = isset( $element[ 'name' ] ) ? $element[ 'name' ] : '';
+
+                if( $replace )
+                {
+                    $replace = false;
+                    $this->setBcc( $element[ 'email' ], $name );
+                }
+                else
+                {
+                    $this->addBcc( $element[ 'email' ], $name );
+                }
+            }
         }
-        $this->BccElements = $newBcc;
+        else
+        {
+            $headers = $this->Mail->getHeaders();
+            $headers->remove( 'bcc' );
+
+            $this->BccElements = [];
+        }
+    }
+
+    function setBcc( $email, $name = false )
+    {
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->bcc( $address );
+
+            $this->BccElements =
+                [
+                    [
+                        'name' => $name,
+                        'email' => $email,
+                    ]
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -555,9 +660,23 @@ class eZMail
     */
     function addBcc( $email, $name = false )
     {
-        $this->Mail->addBcc( new ezcMailAddress( $email, $name, $this->usedCharset() ) );
-        $this->BccElements[] = array( 'name' => $name,
-                                      'email' => $email );
+        // change default value
+        $name = $name ? $name : '';
+        try
+        {
+            $address = new Address( $email, $name );
+            $this->Mail->addBcc( $address );
+
+            $this->BccElements[] =
+                [
+                    'name' => $name,
+                    'email' => $email,
+                ];
+        }
+        catch( Exception $e )
+        {
+            eZDebug::writeWarning( $e->getMessage(), __METHOD__ );
+        }
     }
 
     /*!
@@ -577,7 +696,10 @@ class eZMail
     */
     function addExtraHeader( $headerName, $headerValue )
     {
-        $this->Mail->setHeader( $headerName, $headerValue );
+		$headers = $this->Mail->getHeaders();
+		$headers->addHeader( $headerName, $headerValue );
+		$this->Mail->setHeaders( $headers );
+
         return $this->ExtraHeaders[] = array( 'name' => $headerName,
                                               'content' => $headerValue );
     }
@@ -589,19 +711,16 @@ class eZMail
     */
     function setExtraHeader( $headerName, $headerValue )
     {
-        $this->Mail->setHeader( $headerName, $headerValue );
-        for ( $i = 0; $i < count( $this->ExtraHeaders ); ++$i )
-        {
-            $extraHeader =& $this->ExtraHeaders[$i];
-            if ( isset( $extraHeader['name'] ) and
-                 $extraHeader['name'] == $headerName )
-            {
-                $extraHeader = array( 'name' => $headerName,
-                                      'content' => $headerValue );
-                return true;
-            }
-        }
-        $this->addExtraHeader( $headerName, $headerValue );
+    	foreach( $this->ExtraHeaders as $index => $existingHeader )
+		{
+			if ( isset( $existingHeader[ 'name' ] ) &&
+				$existingHeader['name'] == $headerName )
+			{
+				unset( $existingHeader[ $index ] );
+			}
+		}
+
+		$this->addExtraHeader( $headerName, $headerValue );
     }
 
     /*!
@@ -634,7 +753,6 @@ class eZMail
     */
     function setMessageID( $newMessageID )
     {
-        $this->Mail->messageId = $newMessageID;
         $this->MessageID = $newMessageID;
     }
 
@@ -678,9 +796,11 @@ class eZMail
     */
     function setSubject( $newSubject )
     {
-        $this->Mail->subject = trim( $newSubject );
+        $newSubject = trim( $newSubject );
+
+        $this->Mail->subject = $newSubject;
         $this->Mail->subjectCharset = $this->usedCharset();
-        $this->Subject = trim( $newSubject );
+        $this->Subject = $newSubject;
     }
 
     /*!
@@ -703,24 +823,22 @@ class eZMail
     */
     function setBody( $newBody )
     {
-        // if it's an object (e.g. ezcMailText) then set it directly, otherwise
-        // create a new ezcMailText object to contain the body text
-        if ( $newBody instanceof ezcMailPart )
+        switch( $this->ContentType[ 'type' ] )
         {
-            $this->Mail->body = $newBody;
-        }
-        else
-        {
-            $this->Mail->body = new ezcMailText( $newBody, $this->usedCharset() );
-
-            // if the content-type is in the form of 'text/plain'
-            if ( strpos( $this->ContentType['type'] ,'/' ) !== false )
+            case 'text/html':
             {
-                list( $type, $subType ) = explode( '/', $this->ContentType['type'] );
-                $this->Mail->body->subType = $subType;
+                $this->Mail->text( '', '' );
+                $this->Mail->html( $newBody );
+            }
+            break;
+
+            default:
+            {
+                $this->Mail->html( '', '' );
+                $this->Mail->text( $newBody );
             }
         }
-        $newBody = preg_replace( "/\r\n|\r|\n/", eZMail::lineSeparator(), $newBody );
+
         $this->BodyText = $newBody;
     }
 
@@ -1217,14 +1335,13 @@ class eZMail
     public $MIMEVersion;
 
     /**
-     * Contains an object of type ezcMail, which is used to store the
+     * Contains an object of type Symfony\Component\Mime\Email, which is used to store the
      * mail elements like subject, to, from, body etc, instead of using
      * the existing class variables ($Subject, $From, $receiversElements,
      * $BodyText etc).
      *
-     * @var ezcMail
+     * @var Email
      */
     public $Mail;
 }
 
-?>
