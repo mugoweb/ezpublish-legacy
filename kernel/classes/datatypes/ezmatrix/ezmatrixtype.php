@@ -39,8 +39,9 @@ class eZMatrixType extends eZDataType
         $data = false;
         if ( $http->hasPostVariable( $base . '_ezmatrix_cell_' . $contentObjectAttribute->attribute( 'id' ) ) )
             $data = $http->PostVariable( $base . '_ezmatrix_cell_' . $contentObjectAttribute->attribute( 'id' ) );
+        $dataCount = is_countable( $data ) ? count( $data ) : 0;
         $count = 0;
-        for ( $i = 0; $i < count( $data ); ++$i )
+        for ( $i = 0; $i < $dataCount; ++$i )
              if ( trim( $data[$i] ) <> '' )
              {
                  ++$count;
