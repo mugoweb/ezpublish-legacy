@@ -182,8 +182,8 @@ class eZTemplateForeachFunction
                                                                "{" );
         $newNodes[] = eZTemplateNodeTool::createSpacingIncreaseNode();
 
-        $newNodes[] = eZTemplateNodeTool::createCodePieceNode( "\$$key = \$${arrayKeys}[\$$i];" );
-        $newNodes[] = eZTemplateNodeTool::createCodePieceNode( "\$$val = \$${array}[\$$key];" );
+        $newNodes[] = eZTemplateNodeTool::createCodePieceNode( "\$$key = \${$arrayKeys}[\$$i];" );
+        $newNodes[] = eZTemplateNodeTool::createCodePieceNode( "\$$val = \${$array}[\$$key];" );
 
         // export $itemVar
         $newNodes[] = eZTemplateNodeTool::createVariableNode( false, "$val", $nodePlacement, array(),
