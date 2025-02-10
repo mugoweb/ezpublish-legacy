@@ -184,7 +184,7 @@ class eZModuleOperationInfo
                 if ( $this->UseTriggers )
                     $mementoList = eZOperationMemento::fetchList( $keyArray );
 
-                if ( is_countable( $mementoList ) && ( $mementoList ) > 0 )
+                if ( is_countable( $mementoList ) && count( $mementoList ) > 0 )
                 {
                     $lastResultArray = array();
                     $mementoRestoreSuccess = true;
