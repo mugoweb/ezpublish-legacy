@@ -10,8 +10,10 @@
 
 class eZContentLanguage extends eZPersistentObject
 {
-    public $Locale;
     public $ID;
+    public $Name;
+    public $Locale;
+    public $Disabled;
     /**
      * Persistent object's definition.
      */
