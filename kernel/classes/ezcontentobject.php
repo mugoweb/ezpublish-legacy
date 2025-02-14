@@ -16,6 +16,7 @@
 class eZContentObject extends eZPersistentObject
 {
     public $Permissions;
+    public $ContentObject;
     public $ContentObjectAttributeArray;
     public $CurrentVersion;
     public $OwnerID;

@@ -22,7 +22,7 @@ first_set($var1,$var2,$var3,0)
 
 */
 
-class eZTemplateControlOperator
+class eZTemplateControlOperatoro
 {
     public $CondName;
     public $FirstSetName;
