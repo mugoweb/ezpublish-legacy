@@ -20,6 +20,9 @@ class eZPolicyLimitation extends eZPersistentObject
      * @var int
      */
     public $NodeID;
+    public $PolicyID;
+    public $LimitationID;
+    public $Value;
     public $Values;
     /*!
      Constructor
