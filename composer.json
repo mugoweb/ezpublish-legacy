@@ -20,7 +20,7 @@
         "mugoweb/ezfind": "^2020.04"
     },
     "require": {
-        "php": "^7.1 || ^8.1 <8.4",
+        "php": "^7.3 || ^8.1 <8.4",
         "ext-dom": "*",
         "ext-libxml": "*",
         "ext-mbstring": "*",
