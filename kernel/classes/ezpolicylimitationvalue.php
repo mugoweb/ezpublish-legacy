@@ -18,6 +18,7 @@ class eZPolicyLimitationValue extends eZPersistentObject
 {
     public $LimitationID;
     public $Value;
+    public $Values;
 
     static function definition()
     {
