@@ -29,6 +29,16 @@ class eZImageGDHandler extends eZImageHandler
     public $LuminanceColorScales;
     public $ThresholdList;
     public $HandlerName;
+    public $SupportedInputMIMETypes;
+    public $SupportedOutputMIMETypes;
+    public $ConversionRules;
+    public $OutputRewriteType;
+    public $Filters;
+    public $FilterMap;
+    public $SupportImageFilters;
+    public $MIMETagMap;
+    public $IsEnabled;
+
     public function __construct( $handlerName, $isGloballyEnabled,
                                $outputRewriteType = self::REPLACE_SUFFIX,
                                $conversionRules = false )

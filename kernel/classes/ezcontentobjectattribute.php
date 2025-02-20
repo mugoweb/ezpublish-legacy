@@ -27,6 +27,14 @@ class eZContentObjectAttribute extends eZPersistentObject
     public $DataTypeString;
     public $ContentObjectID;
     public $Version;
+    public $LanguageCode;
+    public $LanguageID;
+    public $AttributeOriginalID;
+    public $SortKeyInt;
+    public $SortKeyString;
+    public $DataText;
+    public $DataInt;
+    public $DataFloat;
     public $AddToBasketIsValid;
     public function __construct( $row )
     {

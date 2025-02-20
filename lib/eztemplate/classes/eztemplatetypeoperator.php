@@ -263,7 +263,7 @@ class eZTemplateTypeOperator
 
             case $this->IsClassName:
             {
-                $code .= '( strtolower( get_class( %1% ) ) == strtolower( %2% ) );';
+                $code .= '( is_object( %1% ) ? strtolower( get_class( %1% ) ) == strtolower( %2% ) : false );';
                 $values[] = $parameters[1];
             } break;
 
@@ -289,7 +289,7 @@ class eZTemplateTypeOperator
 
             case $this->GetClassName:
             {
-                $code .= 'strtolower( get_class( %1% ) );';
+                $code .= '( is_object( %1% ) ? strtolower( get_class( %1% ) ) : "" );';
             } break;
         }
 

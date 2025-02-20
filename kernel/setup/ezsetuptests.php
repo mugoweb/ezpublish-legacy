@@ -257,7 +257,7 @@ function eZSetupCheckMagicQuotes( $type )
         $magicQuote = 0;
     } else {
         //php8 fix - get_magic_quotes_gpc() was removed in php8
-        // repalce it with false based on PHP doc "Always returns false. "
+        // replace it with false based on PHP doc "Always returns false. "
         //https://www.php.net/manual/en/function.get-magic-quotes-gpc.php
         $magicQuote = false;
     }

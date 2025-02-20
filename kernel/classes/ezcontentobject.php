@@ -16,6 +16,7 @@
 class eZContentObject extends eZPersistentObject
 {
     public $Permissions;
+    public $ContentObject;
     public $ContentObjectAttributeArray;
     public $CurrentVersion;
     public $OwnerID;
@@ -882,6 +883,11 @@ class eZContentObject extends eZPersistentObject
      */
     static function fetch( $id, $asObject = true )
     {
+        if ( is_array( $id ) )
+        {
+            $id = '';
+        }
+
         global $eZContentObjectContentObjectCache;
 
         // If the object given by its id is not cached or should be returned as array

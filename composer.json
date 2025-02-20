@@ -20,7 +20,7 @@
         "mugoweb/ezfind": "^2020.04"
     },
     "require": {
-        "php": "^7.1 || ^8.1 <8.4",
+        "php": "^7.3 || ^8.1 <8.4",
         "ext-dom": "*",
         "ext-libxml": "*",
         "ext-mbstring": "*",
@@ -39,7 +39,7 @@
         "zetacomponents/authentication-database-tiein": "~1.2",
         "zetacomponents/cache": "~1.6",
         "zetacomponents/configuration": "~1.4",
-        "zetacomponents/console-tools": "~1.7",
+        "zetacomponents/console-tools": "^1.7.3",
         "zetacomponents/database": "~1.5",
         "zetacomponents/debug": "~1.3",
         "zetacomponents/event-log": "~1.5",
@@ -51,10 +51,11 @@
         "zetacomponents/persistent-object": "~1.8",
         "zetacomponents/signal-slot": "~1.2",
         "zetacomponents/system-information": "~1.1",
-        "zetacomponents/webdav": "~1.1"
+        "zetacomponents/webdav": "~1.1",
+        "zetacomponents/base": "^1.9.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "4.8.36",
+        "phpunit/phpunit": "10.0.0",
         "zetacomponents/php-generator": "~1.1"
     },
     "autoload": {

@@ -21,6 +21,8 @@ class eZTextType extends eZDataType
     const COLS_FIELD = 'data_int1';
     const COLS_VARIABLE = '_eztext_cols_';
 
+    public $Attributes;
+
     public function __construct()
     {
         parent::__construct( self::DATA_TYPE_STRING, ezpI18n::tr( 'kernel/classes/datatypes', "Text block", 'Datatype name' ),

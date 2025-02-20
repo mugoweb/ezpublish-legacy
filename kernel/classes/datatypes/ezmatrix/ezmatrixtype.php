@@ -41,12 +41,15 @@ class eZMatrixType extends eZDataType
             $data = $http->PostVariable( $base . '_ezmatrix_cell_' . $contentObjectAttribute->attribute( 'id' ) );
         $dataCount = is_countable( $data ) ? count( $data ) : 0;
         $count = 0;
+        if ( is_array( $data ) )
+        {
         for ( $i = 0; $i < $dataCount; ++$i )
              if ( trim( $data[$i] ) <> '' )
              {
                  ++$count;
                  break;
              }
+        }
         if ( $contentObjectAttribute->validateIsRequired() and ( $count == 0 or $data === false ) )
         {
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
