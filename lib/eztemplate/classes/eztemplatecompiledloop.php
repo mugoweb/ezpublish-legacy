@@ -88,6 +88,7 @@ class eZTemplateCompiledLoop
                                                                     array( 'treat-value-as-non-object' => true, 'text-result' => false ),
                                                                     "{$fName}_sequence_array_$uniqid" );
        $this->NewNodes[] = eZTemplateNodeTool::createCodePieceNode( "\${$fName}_sequence_var_$uniqid = current( \${$fName}_sequence_array_$uniqid );\n" );
+    }
 
     /*!
      * Export current sequence value to the template variable specified in loop parameters.
