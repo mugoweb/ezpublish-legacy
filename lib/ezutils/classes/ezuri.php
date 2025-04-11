@@ -656,7 +656,7 @@ class eZURI
             $href = '/';
         else if ( $href[0] == '#' )
         {
-            $href = $htmlEscape ? htmlspecialchars( $href ) : $href;
+            $href = $htmlEscape ? htmlspecialchars( (string) $href ) : $href;
             return true;
         }
         else if ( $href[0] != '/' )
@@ -691,7 +691,7 @@ class eZURI
      */
     private static function escapeHtmlTransformUri( $href )
     {
-        return str_replace( '&amp;amp;', '&amp;', htmlspecialchars( $href ) );
+        return str_replace( '&amp;amp;', '&amp;', htmlspecialchars( (string) $href ) );
     }
 
     /**
