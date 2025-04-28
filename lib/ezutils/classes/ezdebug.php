@@ -95,7 +95,9 @@ class eZDebug
                                       self::LEVEL_WARNING => array(),
                                       self::LEVEL_ERROR => array(),
                                       self::LEVEL_DEBUG => array(),
-                                      self::LEVEL_STRICT => array() );
+                                      self::LEVEL_STRICT => array(),
+                                      self::LEVEL_DEPRECATED => array(),
+        );
 
         $this->OutputFormat = array( self::LEVEL_NOTICE => array( "color" => "green",
                                                                'style' => 'notice',
