@@ -251,7 +251,9 @@ $keyArray = array( array( 'object', $contentObject->attribute( 'id' ) ),
                    array( 'url_alias', $node->attribute( 'url_alias' ) ),
                    array( 'class_group', $contentObject->attribute( 'match_ingroup_id_list' ) ),
                    array( 'state', $contentObject->attribute( 'state_id_array' ) ),
-                   array( 'state_identifier', $contentObject->attribute( 'state_identifier_array' ) ) );
+                   array( 'state_identifier', $contentObject->attribute( 'state_identifier_array' ) ),
+                   array( 'layout', false )
+);
 
 $parentNode = $node->attribute( 'parent' );
 if ( is_object( $parentNode ) )
