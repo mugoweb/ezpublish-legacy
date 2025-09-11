@@ -288,7 +288,7 @@ class eZContentOperationCollection
         {
             $existingNode = eZContentObjectTreeNode::fetchByRemoteID( $nodeAssignment->attribute( 'parent_remote_id' ) );
         }
-        if ( !$existingNode );
+        if ( !$existingNode )
         {
             $existingNode = eZContentObjectTreeNode::findNode( $nodeID , $object->attribute( 'id' ), true );
         }
