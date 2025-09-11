@@ -2,11 +2,11 @@
 /**
  * File containing the oauth/authorize view definition
  *
- * @param string $_GET[client_id] the client application identifier, as in ezpRestClient
- * @param string $_GET[redirect_uri] the URI the view should redirect to in case of success
- * @param string $_GET[response_type] the requested response type. Can be code_and_token, code, or token
- * @param string $_GET[scope] the permissions scope the client requests (optional)
- * @param string $_GET[state] Not implemented yet (optional)
+ * @param string $_GET['client_id'] the client application identifier, as in ezpRestClient
+ * @param string $_GET['redirect_uri'] the URI the view should redirect to in case of success
+ * @param string $_GET['response_type'] the requested response type. Can be code_and_token, code, or token
+ * @param string $_GET['scope'] the permissions scope the client requests (optional)
+ * @param string $_GET['state'] Not implemented yet (optional)
  *
  * @copyright Copyright (C) eZ Systems AS. All rights reserved.
  * @license For full copyright and license information view LICENSE file distributed with this source code.
@@ -165,7 +165,7 @@ if ( $pResponseType == 'token')
     $parameters[] = 'access_token=' . urlencode( $rAccessToken );
     $parameters[] = 'refresh_token=' . urlencode( $rRefreshToken );
     $parameters[] = "expires_in=$rExpiresIn";
-    $location = "{$pRedirectUri}?" . implode( $parameters, '&' );
+    $location = "{$pRedirectUri}?" . implode('&', $parameters);
 
     response( '302 Found', $location );
 }
@@ -197,7 +197,7 @@ elseif ( $pResponseType ==  'code')
 
     $parameters[] = 'code=' . urlencode( $rCode );
     $parameters[] = "expires_in=$rExpiresIn";
-    $location = "{$pRedirectUri}?" . implode( $parameters, '&' );
+    $location = "{$pRedirectUri}?" . implode( '&', $parameters);
 
     response( '302 Found', $location );
 }

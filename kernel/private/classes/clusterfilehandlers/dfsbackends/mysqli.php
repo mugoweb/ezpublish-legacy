@@ -1296,7 +1296,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
      *
      * @return bool|array
      */
-    protected function _selectOne( $query, $fname, $error = false, $debug = false, $fetchCall )
+    protected function _selectOne( $query, $fname, $error = false, $debug = false, $fetchCall = null)
     {
         eZDebug::accumulatorStart( 'mysql_cluster_query', 'MySQL Cluster', 'DB queries' );
         $time = microtime( true );
@@ -1465,7 +1465,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
     {
         if ( $res === false )
         {
-            eZDebug::writeError( "SQL failed" );
+            eZDebug::writeError( "SQL failed", __METHOD__ );
         }
         elseif ( $res instanceof eZMySQLBackendError )
         {
@@ -1663,7 +1663,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
             if ( $errno != 1062 )
             {
                 eZDebug::writeError( "Unexpected error #$errno when trying to start cache generation on $filePath (".mysqli_error( $this->db ).")", __METHOD__ );
-                eZDebug::writeDebug( $query, '$query' );
+                eZDebug::writeDebug( $query, __METHOD__ );
 
                 // @todo Make this an actual error, maybe an exception
                 return array( 'res' => 'ko' );
@@ -1744,7 +1744,7 @@ class eZDFSFileHandlerMySQLiBackend implements eZClusterEventNotifier
                 return false;
             }
             $generatingMetaData = mysqli_fetch_assoc( $res );
-            
+
             if ( empty( $generatingMetaData ) )
             {
                 eZDebug::writeError("An error occured while ending cache generation,  $generatingFilePath", $fname );

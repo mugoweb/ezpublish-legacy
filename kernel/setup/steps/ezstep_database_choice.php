@@ -93,6 +93,7 @@ class eZStepDatabaseChoice extends eZStepInstaller
         $databaseMap = eZSetupDatabaseMap();
         $availableDatabases = array();
         $databaseList = array();
+
         if ( isset( $this->PersistenceList['database_extensions']['found'] ) )
         {
             $databaseExtensions = $this->PersistenceList['database_extensions']['found'];

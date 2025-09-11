@@ -11,6 +11,7 @@
     <option value="http://">{'Http'|i18n('design/standard/ezoe')}</option>
     <option value="https://">{'Https'|i18n('design/standard/ezoe')}</option>
     <option value="mailto:">{'Mail'|i18n('design/standard/ezoe')}</option>
+    <option value="tel:">{'Tel'|i18n('design/standard/ezoe')}</option>
     <option value="#">{'Anchor'|i18n('design/standard/ezoe')}</option>
     <option value="">{'Other'|i18n('design/standard/ezoe')}</option>
 {/if}

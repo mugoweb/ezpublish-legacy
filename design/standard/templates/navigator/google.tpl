@@ -6,10 +6,13 @@
          page_uri_suffix=false()
          left_max=$left_max
          right_max=$right_max}
+{* Avoiding PHP 8.1 error: Unsupported operand types: string / int *}
+{set $item_limit=int($item_limit)}
+{set $item_count=int($item_count)}
 
 {let page_count=int( ceil( div( $item_count,$item_limit ) ) )
       current_page=min($:page_count,
-                       int( ceil( div( first_set( $view_parameters.offset, 0 ),
+                       int( ceil( div( int(first_set( $view_parameters.offset, 0)),
                                        $item_limit ) ) ) )
       item_previous=sub( mul( $:current_page, $item_limit ),
                          $item_limit )

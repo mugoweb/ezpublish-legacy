@@ -27,6 +27,7 @@ class eZMediaType extends eZDataType
     {
         parent::__construct( self::DATA_TYPE_STRING, ezpI18n::tr( 'kernel/classes/datatypes', "Media", 'Datatype name' ),
                            array( 'serialize_supported' => true ) );
+        $this->FileExtensionBlackListValidator = new eZFileExtensionBlackListValidator();
     }
 
     /*!
@@ -181,14 +182,36 @@ class eZMediaType extends eZDataType
         $maxSize = 1024 * 1024 * $classAttribute->attribute( self::MAX_FILESIZE_FIELD );
         $mustUpload = false;
 
-        if ( $contentObjectAttribute->validateIsRequired() )
+        $contentObjectAttributeID = $contentObjectAttribute->attribute( 'id' );
+        $version = $contentObjectAttribute->attribute( 'version' );
+        $media = eZMedia::fetch( $contentObjectAttributeID, $version );
+        $extensionsBlackList = implode(', ', $this->FileExtensionBlackListValidator->extensionsBlackList() );
+        if ( $media === null || !$media->attribute( 'filename' ) )
         {
-            $contentObjectAttributeID = $contentObjectAttribute->attribute( "id" );
-            $version = $contentObjectAttribute->attribute( "version" );
-            $media = eZMedia::fetch( $contentObjectAttributeID, $version );
-            if ( $media === null || !$media->attribute( 'filename' ) )
+            if ( $contentObjectAttribute->validateIsRequired() )
             {
                 $mustUpload = true;
+            }
+        }
+        else
+        {
+            $state = $this->FileExtensionBlackListValidator->validate( $media->attribute( 'filename' ) );
+            if ( $state === eZInputValidator::STATE_INVALID || $state === eZInputValidator::STATE_INTERMEDIATE )
+            {
+                $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
+                    "A valid file is required. The following file extensions are blacklisted: $extensionsBlackList" ) );
+                return eZInputValidator::STATE_INVALID;
+            }
+        }
+
+        if ( isset( $_FILES[$httpFileName] ) && $_FILES[$httpFileName]['tmp_name'] !== '')
+        {
+            $state = $this->FileExtensionBlackListValidator->validate( $_FILES[$httpFileName]['name'] );
+            if ( $state === eZInputValidator::STATE_INVALID || $state === eZInputValidator::STATE_INTERMEDIATE )
+            {
+                $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
+                    "A valid file is required. The following file extensions are blacklisted: $extensionsBlackList" ) );
+                return eZInputValidator::STATE_INVALID;
             }
         }
 
@@ -274,6 +297,11 @@ class eZMediaType extends eZDataType
 
         eZMediaType::checkFileUploads();
 
+        if ( $this->validateObjectAttributeHTTPInput( $http, $base, $contentObjectAttribute ) !== eZInputValidator::STATE_ACCEPTED )
+        {
+            return false;
+        }
+
         $classAttribute = $contentObjectAttribute->contentClassAttribute();
         $player = $classAttribute->attribute( "data_text1" );
         $pluginPage = eZMediaType::pluginPage( $player );
@@ -338,7 +366,7 @@ class eZMediaType extends eZDataType
             }
 
             $orig_dir = $mediaFile->storageDir( "original" );
-            eZDebug::writeNotice( "dir=$orig_dir" );
+            eZDebug::writeNotice( "dir=$orig_dir", __METHOD__ );
             $media->setAttribute( "filename", basename( $mediaFile->attribute( "filename" ) ) );
             $media->setAttribute( "original_filename", $mediaFile->attribute( "original_filename" ) );
             $media->setAttribute( "mime_type", $mime );
@@ -799,6 +827,10 @@ class eZMediaType extends eZDataType
     {
         return true;
     }
+
+    /// \privatesection
+    /// The file extension blacklist validator
+    private $FileExtensionBlackListValidator;
 }
 
 eZDataType::register( eZMediaType::DATA_TYPE_STRING, "eZMediaType" );

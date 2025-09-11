@@ -57,6 +57,7 @@ print( $time1->isEqualTo( $time3 ) ? 'true' : 'false' ); // Prints 'true'
 
 class eZTime
 {
+    public $IsValid;
     /*!
      Number of seconds in a minute.
     */
@@ -157,7 +158,7 @@ class eZTime
     */
     function setHour( $hour )
     {
-        $this->Time = ($hour % 24) * self::SECONDS_AN_HOUR + $this->minute() * self::SECONDS_A_MINUTE + $this->second();
+        $this->Time = ((int)$hour % 24) * self::SECONDS_AN_HOUR + $this->minute() * self::SECONDS_A_MINUTE + $this->second();
         $this->IsValid = $this->Time >= 0;
     }
 
@@ -166,7 +167,7 @@ class eZTime
     */
     function setMinute( $min )
     {
-        $this->Time = $this->hour() * self::SECONDS_AN_HOUR + ($min % 60) * self::SECONDS_A_MINUTE + $this->second();
+        $this->Time = $this->hour() * self::SECONDS_AN_HOUR + ((int)$min % 60) * self::SECONDS_A_MINUTE + $this->second();
         $this->IsValid = $this->Time >= 0;
     }
 
@@ -175,7 +176,7 @@ class eZTime
     */
     function setSecond( $sec )
     {
-        $this->Time = $this->hour() * self::SECONDS_AN_HOUR + $this->minute() * self::SECONDS_A_MINUTE + ($sec % 60);
+        $this->Time = $this->hour() * self::SECONDS_AN_HOUR + $this->minute() * self::SECONDS_A_MINUTE + ((int)$sec % 60);
         $this->IsValid = $this->Time >= 0;
     }
 
@@ -184,7 +185,7 @@ class eZTime
     */
     function setHMS( $hour, $min = 0, $sec = 0 )
     {
-        $this->Time = ($hour % 24 ) * self::SECONDS_AN_HOUR + ($min % 60) * self::SECONDS_A_MINUTE + ($sec % 60);
+        $this->Time = ((int)$hour % 24 ) * self::SECONDS_AN_HOUR + ((int)$min % 60) * self::SECONDS_A_MINUTE + ((int)$sec % 60);
         $this->IsValid = $this->Time >= 0;
     }
 
@@ -279,9 +280,9 @@ class eZTime
         $cur_date = getdate();
 
         $time = new eZTime();
-        $time->setHMS( $hour < 0 ? $cur_date[ 'hours' ] : $hour,
-                       $minute < 0 ? $cur_date[ 'minutes' ] : $minute,
-                       $second < 0 ? $cur_date[ 'seconds' ] : $second );
+        $time->setHMS( $hour < 0 ? $cur_date[ 'hours' ] : (int)$hour,
+                       $minute < 0 ? $cur_date[ 'minutes' ] : (int)$minute,
+                       $second < 0 ? $cur_date[ 'seconds' ] : (int)$second );
         return $time;
     }
 

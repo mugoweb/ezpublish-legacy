@@ -428,7 +428,7 @@ CREATE TABLE ezcontentobject_attribute (
   contentobject_id int(11) NOT NULL default '0',
   data_float double default NULL,
   data_int int(11) default NULL,
-  data_text longtext,
+  data_text longtext NOT NULL DEFAULT (_utf8mb4''),
   data_type_string varchar(50) default '',
   id int(11) NOT NULL auto_increment,
   language_code varchar(20) NOT NULL default '',
@@ -1608,7 +1608,7 @@ CREATE TABLE ezuser (
   password_hash varchar(255) default NULL,
   password_hash_type int(11) NOT NULL default '1',
   PRIMARY KEY  (contentobject_id),
-  KEY ezuser_login (login)
+  UNIQUE KEY ezuser_login (login)
 ) ENGINE=InnoDB;
 
 

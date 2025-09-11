@@ -41,6 +41,12 @@ function eZSetupDatabaseMap()
                                     'required_version' => '8.0',
                                     'has_demo_data' => false,
                                     'supports_unicode' => true ),
+                  'sqlite3' => array( 'type' => 'sqlite3',
+                                      'driver' => 'sqlite3',
+                                      'name' => 'SQLLite',
+                                      'required_version' => '3.0.1',
+                                      'has_demo_data' => true,
+                                      'supports_unicode' => true )
                    );
 }
 

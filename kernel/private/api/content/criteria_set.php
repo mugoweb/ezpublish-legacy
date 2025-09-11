@@ -21,7 +21,7 @@ class ezpContentCriteriaSet implements ArrayAccess, Countable, Iterator
      * @param mixed $offset
      * @param eZContentCriteria $value
      */
-    public function offsetSet( $offset, $value )
+    public function offsetSet( $offset, $value ): void
     {
         $this->criteria[] = $value;
     }
@@ -31,45 +31,51 @@ class ezpContentCriteriaSet implements ArrayAccess, Countable, Iterator
      *
      * @param mixed $offset
      */
-    public function offsetGet( $offset ){}
+    public function offsetGet( $offset ): mixed{
+        return $this->criteria[$offset];
+    }
 
-    public function offsetExists( $offset ){}
+    public function offsetExists( $offset ): bool {
+        return isset ($this->criteria[$offset]);
+    }
 
-    public function offsetUnset( $offset ){}
+    public function offsetUnset( $offset ): void{
+        unset( $this->criteria[$offset] );
+    }
 
     /**
      * Returns the number of registered criteria
      * @note Implements the count() method of the Countable interface
      * @return int
      */
-    public function count()
+    public function count(): int
     {
         return count( $this->criteria );
     }
 
     //// Iterator interface
 
-    public function key()
+    public function key(): mixed
     {
         return  $this->pointer;
     }
 
-    public function current ()
+    public function current (): mixed
     {
         return $this->criteria[$this->pointer];
     }
 
-    public function next()
+    public function next(): void
     {
         ++$this->pointer;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         $this->pointer = 0;
     }
 
-    public function valid()
+    public function valid(): bool
     {
         return isset( $this->criteria[$this->pointer] );
     }

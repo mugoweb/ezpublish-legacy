@@ -282,7 +282,7 @@ class eZDateTime
     {
         $arr = getdate( $this->DateTime );
         $this->DateTime = mktime( $arr['hours'], $arr['minutes'], $arr['seconds'],
-                                  $arr['mon'], $arr['mday'], $year );
+                                  $arr['mon'], $arr['mday'], (int)$year );
     }
 
     /*!
@@ -292,7 +292,7 @@ class eZDateTime
     {
         $arr = getdate( $this->DateTime );
         $this->DateTime = mktime( $arr['hours'], $arr['minutes'], $arr['seconds'],
-                                  $month, $arr['mday'], $arr['year'] );
+                                  (int)$month, $arr['mday'], $arr['year'] );
     }
 
     /*!
@@ -302,7 +302,7 @@ class eZDateTime
     {
         $arr = getdate( $this->DateTime );
         $this->DateTime = mktime( $arr['hours'], $arr['minutes'], $arr['seconds'],
-                                  $arr['mon'], $day, $arr['year'] );
+                                  $arr['mon'], (int)$day, $arr['year'] );
     }
 
     /*!
@@ -311,7 +311,7 @@ class eZDateTime
     function setHour( $hour )
     {
         $arr = getdate( $this->DateTime );
-        $this->DateTime = mktime( $hour, $arr['minutes'], $arr['seconds'],
+        $this->DateTime = mktime( (int)$hour, $arr['minutes'], $arr['seconds'],
                                   $arr['mon'], $arr['mday'], $arr['year'] );
     }
 
@@ -321,7 +321,7 @@ class eZDateTime
     function setMinute( $min )
     {
         $arr = getdate( $this->DateTime );
-        $this->DateTime = mktime( $arr['hours'], $min, $arr['seconds'],
+        $this->DateTime = mktime( $arr['hours'], (int)$min, $arr['seconds'],
                                   $arr['mon'], $arr['mday'], $arr['year'] );
     }
 
@@ -331,7 +331,7 @@ class eZDateTime
     function setSecond( $sec )
     {
         $arr = getdate( $this->DateTime );
-        $this->DateTime = mktime( $arr['hours'], $arr['minutes'], $sec,
+        $this->DateTime = mktime( $arr['hours'], $arr['minutes'], (int)$sec,
                                   $arr['mon'], $arr['mday'], $arr['year'] );
     }
 
@@ -341,7 +341,7 @@ class eZDateTime
     function setHMS( $hour, $min = 0, $sec = 0 )
     {
         $arr = getdate( $this->DateTime );
-        $this->DateTime = mktime( $hour, $min, $sec,
+        $this->DateTime = mktime( (int)$hour, (int)$min, (int)$sec,
                                   $arr['mon'], $arr['mday'], $arr['year'] );
     }
 
@@ -350,7 +350,7 @@ class eZDateTime
     */
     function setMDYHMS( $month, $day, $year, $hour, $min, $sec = 0 )
     {
-        $this->DateTime = mktime( $hour, $min, $sec, $month, $day, $year );
+        $this->DateTime = mktime( (int)$hour, (int)$min, (int)$sec, (int)$month, (int)$day, (int)$year );
     }
 
     /*!
@@ -362,13 +362,13 @@ class eZDateTime
         $arr = getdate( $this->DateTime );
         if ( $year != 0 )
             $date = mktime( $arr['hours'], $arr['minutes'], $arr['seconds'],
-                            $month, $day, $year );
+                            (int)$month, (int)$day, (int)$year );
         else if ( $day != 0 )
             $date = mktime( $arr['hours'], $arr['minutes'], $arr['seconds'],
-                            $month, $day );
+                            (int)$month, (int)$day );
         else
             $date = mktime( $arr['hours'], $arr['minutes'], $arr['seconds'],
-                            $month );
+                            (int)$month );
         $this->DateTime = $date;
     }
 
@@ -379,8 +379,8 @@ class eZDateTime
     function adjustDateTime( $hour, $minute = 0, $second = 0, $month = 0, $day = 0, $year = 0 )
     {
         $arr = getdate( $this->DateTime );
-        $date = mktime( $hour + $arr['hours'], $minute + $arr['minutes'], $second + $arr['seconds'],
-                        $month + $arr['mon'], $day + $arr['mday'], $year + $arr['year'] );
+        $date = mktime( (int)$hour + $arr['hours'], (int)$minute + $arr['minutes'], (int)$second + $arr['seconds'],
+                        (int)$month + $arr['mon'], (int)$day + $arr['mday'], (int)$year + $arr['year'] );
         $this->DateTime = $date;
     }
 
@@ -451,17 +451,17 @@ class eZDateTime
     static function create( $hour = -1, $minute = -1, $second = -1, $month = -1, $day = -1, $year = -1 )
     {
         if ( $year != -1 )
-            $datetime = mktime( $hour, $minute, $second, $month, $day, $year );
+            $datetime = mktime( (int)$hour, (int)$minute, (int)$second, (int)$month, (int)$day, (int)$year );
         else if ( $day != -1 )
-            $datetime = mktime( $hour, $minute, $second, $month, $day );
+            $datetime = mktime( (int)$hour, (int)$minute, (int)$second, (int)$month, (int)$day );
         else if ( $month != -1 )
-            $datetime = mktime( $hour, $minute, $second, $month );
+            $datetime = mktime( (int)$hour, (int)$minute, (int)$second, (int)$month );
         else if ( $second != -1 )
-            $datetime = mktime( $hour, $minute, $second );
+            $datetime = mktime( (int)$hour, (int)$minute, (int)$second );
         else if ( $minute != -1 )
-            $datetime = mktime( $hour, $minute );
+            $datetime = mktime( (int)$hour, (int)$minute );
         else if ( $hour != -1 )
-            $datetime = mktime( $hour );
+            $datetime = mktime( (int)$hour );
         else
             $datetime = time();
         return new eZDateTime( $datetime );

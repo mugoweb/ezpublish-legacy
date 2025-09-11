@@ -16,6 +16,7 @@
 
 class eZModuleOperationInfo
 {
+    public $OperationList;
     const ERROR_NO_CLASS = 5;
     const ERROR_NO_CLASS_METHOD = 6;
     const ERROR_CLASS_INSTANTIATE_FAILED = 7;
@@ -183,7 +184,7 @@ class eZModuleOperationInfo
                 if ( $this->UseTriggers )
                     $mementoList = eZOperationMemento::fetchList( $keyArray );
 
-                if ( count( $mementoList ) > 0 )
+                if ( is_countable( $mementoList ) && count( $mementoList ) > 0 )
                 {
                     $lastResultArray = array();
                     $mementoRestoreSuccess = true;

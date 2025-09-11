@@ -296,7 +296,12 @@ class eZLDAPUser extends eZUser
 
                 if( !$password )
                 {
-                    $password = crypt( microtime() );
+					//PHP 8 fix - change the method to genereate random password
+					//it is safe to change the hash method
+					//because this condition is about to genereate a random password to trigger eZUser::setFailedLoginAttempts
+                    //also, PHP doc encourages the use of password_hash to replace crypt() 
+                    //Ref: https://www.php.net/manual/en/function.crypt.php
+                    $password = password_hash( microtime(),  PASSWORD_DEFAULT );
                 }
 
                 // is it real authenticated LDAP user?

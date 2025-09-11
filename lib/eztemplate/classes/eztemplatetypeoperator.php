@@ -33,6 +33,19 @@ $var|get_class or get_class( $var )
 
 class eZTemplateTypeOperator
 {
+    public $IsBooleanName;
+    public $IsIntegerName;
+    public $IsFloatName;
+    public $IsNumericName;
+    public $IsStringName;
+    public $IsObjectName;
+    public $IsClassName;
+    public $IsNullName;
+    public $IsSetName;
+    public $IsUnsetName;
+    public $GetTypeName;
+    public $GetClassName;
+    public $PHPNameMap;
     /**
      * Initializes the operator class with the various operator names.
      *
@@ -250,7 +263,7 @@ class eZTemplateTypeOperator
 
             case $this->IsClassName:
             {
-                $code .= '( strtolower( get_class( %1% ) ) == strtolower( %2% ) );';
+                $code .= '( is_object( %1% ) ? strtolower( get_class( %1% ) ) == strtolower( %2% ) : false );';
                 $values[] = $parameters[1];
             } break;
 
@@ -276,7 +289,7 @@ class eZTemplateTypeOperator
 
             case $this->GetClassName:
             {
-                $code .= 'strtolower( get_class( %1% ) );';
+                $code .= '( is_object( %1% ) ? strtolower( get_class( %1% ) ) : "" );';
             } break;
         }
 

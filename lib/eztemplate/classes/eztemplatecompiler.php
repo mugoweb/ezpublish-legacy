@@ -819,9 +819,12 @@ class eZTemplateCompiler
         }
         else
         {
-            $newPlacement[1][0] = $newNode[3][1][0]; // Line end
-            $newPlacement[1][1] = $newNode[3][1][1]; // Column end
-            $newPlacement[1][2] = $newNode[3][1][2]; // Position end
+            if ( !is_bool( $newNode[3] ) )
+            {
+                $newPlacement[1][0] = $newNode[3][1][0]; // Line end
+                $newPlacement[1][1] = $newNode[3][1][1]; // Column end
+                $newPlacement[1][2] = $newNode[3][1][2]; // Position end
+            }
         }
         $lastNode = false;
         $newNode = array( eZTemplate::NODE_TEXT,
@@ -2240,7 +2243,7 @@ END;
                 }
                 else
                     eZDebug::writeWarning( "Unknown internal template node type $nodeType, ignoring node for code generation",
-                                           'eZTemplateCompiler:generatePHPCodeChildren' );
+                                           __METHOD__ );
             }
             else if ( $nodeType == eZTemplate::NODE_ROOT )
             {

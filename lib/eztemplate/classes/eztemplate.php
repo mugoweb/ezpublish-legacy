@@ -197,6 +197,8 @@ Denne koster {1.4|l10n(currency)}<br>
 
 class eZTemplate
 {
+    public $MaxLevelWarning;
+    public $TemplateFetchList;
     const RESOURCE_FETCH = 1;
     const RESOURCE_QUERY = 2;
 
@@ -537,11 +539,11 @@ class eZTemplate
                 if ( eZTemplate::isDebugEnabled() )
                 {
                     $fname = $resourceData['template-filename'];
-                    eZDebug::writeDebug( "FETCH START URI: $template, $fname" );
+                    eZDebug::writeDebug( "FETCH START URI: $template, $fname", __METHOD__ );
                 }
                 $this->process( $root, $text, "", "" );
                 if ( eZTemplate::isDebugEnabled() )
-                    eZDebug::writeDebug( "FETCH END URI: $template, $fname" );
+                    eZDebug::writeDebug( "FETCH END URI: $template, $fname", __METHOD__ );
             }
 
             eZDebug::accumulatorStop( 'template_processing' );
@@ -642,10 +644,10 @@ class eZTemplate
              is_object( $func ) )
         {
             if ( eZTemplate::isMethodDebugEnabled() )
-                eZDebug::writeDebug( "START FUNCTION: $functionName" );
+                eZDebug::writeDebug( "START FUNCTION: $functionName", __METHOD__ );
             $value = $func->process( $this, $textElements, $functionName, $functionChildren, $functionParameters, $functionPlacement, $rootNamespace, $currentNamespace );
             if ( eZTemplate::isMethodDebugEnabled() )
-                eZDebug::writeDebug( "END FUNCTION: $functionName" );
+                eZDebug::writeDebug( "END FUNCTION: $functionName", __METHOD__ );
             return $value;
         }
         else
@@ -737,7 +739,7 @@ class eZTemplate
      - "text", the text.
      - "time-stamp", the timestamp.
     */
-    function loadURIRoot( $uri, $displayErrors = true, &$extraParameters )
+    function loadURIRoot( $uri, $displayErrors, &$extraParameters )
     {
         $res = "";
         $template = "";
@@ -794,13 +796,13 @@ class eZTemplate
         return $resourceData;
     }
 
-    function processURI( $uri, $displayErrors = true, &$extraParameters,
+    function processURI( $uri, $displayErrors, &$extraParameters,
                          &$textElements, $rootNamespace, $currentNamespace )
     {
         $this->Level++;
         if ( $this->Level > $this->MaxLevel )
         {
-            eZDebug::writeError( $this->MaxLevelWarning, __METHOD__ . " Level: $this->Level @ $uri" );
+            eZDebug::writeError( $this->MaxLevelWarning, __METHOD__ . " Level: $this->Level @ $uri", __METHOD__ );
             $textElements[] = $this->MaxLevelWarning;
             $this->Level--;
             return;
@@ -833,11 +835,11 @@ class eZTemplate
             if ( eZTemplate::isDebugEnabled() )
             {
                 $fname = $resourceData['template-filename'];
-                eZDebug::writeDebug( "START URI: $uri, $fname" );
+                eZDebug::writeDebug( "START URI: $uri, $fname", __METHOD__ );
             }
             $this->process( $resourceData['root-node'], $text, $rootNamespace, $currentNamespace );
             if ( eZTemplate::isDebugEnabled() )
-                eZDebug::writeDebug( "END URI: $uri, $fname" );
+                eZDebug::writeDebug( "END URI: $uri, $fname", __METHOD__ );
             $this->setIncludeOutput( $uri, $text );
             $textElements[] = $text;
         }
@@ -1006,7 +1008,7 @@ class eZTemplate
             $template = $uri;
         if ( eZTemplate::isDebugEnabled() )
         {
-            eZDebug::writeNotice( "eZTemplate: Loading template \"$template\" with resource \"$res\"" );
+            eZDebug::writeNotice( "Loading template \"$template\" with resource \"$res\"", __METHOD__ );
         }
         if ( isset( $this->Resources[$res] ) and is_object( $this->Resources[$res] ) )
         {
@@ -1352,11 +1354,11 @@ class eZTemplate
             {
                 $value = $valueData['value'];
                 if ( eZTemplate::isMethodDebugEnabled() )
-                    eZDebug::writeDebug( "START OPERATOR: $operatorName" );
+                    eZDebug::writeDebug( "START OPERATOR: $operatorName", __METHOD__ );
                 $op->modify( $this, $operatorName, $operatorParameters, $rootNamespace, $currentNamespace, $value, $namedParameters,
                              $placement );
                 if ( eZTemplate::isMethodDebugEnabled() )
-                    eZDebug::writeDebug( "END OPERATOR: $operatorName" );
+                    eZDebug::writeDebug( "END OPERATOR: $operatorName", __METHOD__ );
                 $valueData['value'] = $value;
             }
             else
@@ -1426,7 +1428,7 @@ class eZTemplate
         }
 
         $op = $this->Operators[$name];
-        if ( isset( $op ) and
+        if ( isset( $op ) and is_object( $op ) and
              method_exists( $op, "namedParameterList" ) )
         {
             $param_list = $op->namedParameterList();
@@ -1487,7 +1489,7 @@ class eZTemplate
      * Sets the template variable $var to the value $val.
      *
      * @param string $var
-     * @param string $val
+     * @param mixed $val
      * @param string $namespace (optional)
      * @param bool $scopeSafe If true, will assure that $var is not overridden for $namespace. False by default
      */
@@ -2251,7 +2253,7 @@ class eZTemplate
             {
                 eZDebug::writeWarning( "Path '$path' does not have the file 'eztemplateautoload.php' allthough it reported it had one.\n" .
                                        "Looked for file '" . $autoloadFile . "'\n" .
-                                       "Check the setting [TemplateSettings]/ExtensionAutoloadPath or AutoloadPathList in your site.ini settings." );
+                                       "Check the setting [TemplateSettings]/ExtensionAutoloadPath or AutoloadPathList in your site.ini settings.", __METHOD__ );
             }
         }
     }

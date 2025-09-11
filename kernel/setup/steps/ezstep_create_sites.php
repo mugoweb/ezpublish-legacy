@@ -46,6 +46,7 @@
 
 class eZStepCreateSites extends eZStepInstaller
 {
+    public $Error;
     /**
      * Constructor
      *
@@ -72,7 +73,13 @@ class eZStepCreateSites extends eZStepInstaller
 
         $siteType = $this->chosenSiteType();
 
-        ezpAutoloader::updateExtensionAutoloadArray();
+        // If we are installing a package without extension packages we
+        // generate the autoload array for extensions.
+        // For the time being we only do this for the plain_site package.
+        if ( $siteType['identifier'] == 'plain_site' )
+        {
+            ezpAutoloader::updateExtensionAutoloadArray();
+        }
 
         $saveData = true; // set to true to save data
 
@@ -290,7 +297,8 @@ class eZStepCreateSites extends eZStepInstaller
         $ini->setVariable( 'SiteSettings', 'SiteList', $accessMap['sites'] );
         $ini->setVariable( 'SiteAccessSettings', 'AvailableSiteAccessList', $accessMap['accesses'] );
         $ini->setVariable( "SiteAccessSettings", "CheckValidity", "false" );
-        $ini->setVariable( 'Session', 'SessionNameHandler', 'custom' );
+        // With this following line commented out, php default session management is used
+        // $ini->setVariable( 'Session', 'SessionNameHandler', 'custom' );
         $ini->setVariable( 'MailSettings', 'AdminEmail', $this->PersistenceList['admin']['email'] );
         $ini->setVariable( 'MailSettings', 'EmailSender', false );
 
@@ -406,7 +414,7 @@ class eZStepCreateSites extends eZStepInstaller
 
         $dbServer = $databaseInfo['server'];
         $dbPort = $databaseInfo['port'];
-//        $dbName = $databaseInfo['dbname'];
+        $dbName = $databaseInfo['dbname'];
         $dbSocket = $databaseInfo['socket'];
         $dbUser = $databaseInfo['user'];
         $dbPwd = $databaseInfo['password'];
@@ -512,7 +520,7 @@ class eZStepCreateSites extends eZStepInstaller
                 }
             }
 
-            if ( $result )
+            if ( $result && $db->databaseName() != 'sqlite' )
             {
                 // Inserting data from the dba-data files of the datatypes
                 eZDataType::loadAndRegisterAllTypes();
@@ -643,11 +651,11 @@ class eZStepCreateSites extends eZStepInstaller
         if ( function_exists( 'eZSitePreInstall' ) )
             eZSitePreInstall( $siteType );
 
+        $engLanguageObj = eZContentLanguage::fetchByLocale( 'eng-GB' );
 
         // Make sure objects use the selected main language instead of eng-GB
-        if ( $primaryLanguageLocaleCode != 'eng-GB' )
+        if ( $engLanguageObj != false && $primaryLanguageLocaleCode != 'eng-GB' )
         {
-            $engLanguageObj = eZContentLanguage::fetchByLocale( 'eng-GB' );
             $engLanguageID = (int)$engLanguageObj->attribute( 'id' );
             $updateSql = "UPDATE ezcontent_language
 SET

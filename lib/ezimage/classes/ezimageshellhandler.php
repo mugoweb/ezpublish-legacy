@@ -17,6 +17,20 @@
 
 class eZImageShellHandler extends eZImageHandler
 {
+    public $UseTypeTag;
+    public $QualityParameters;
+    public $FrameRangeParameters;
+    public $HandlerName;
+    public $SupportedInputMIMETypes;
+    public $SupportedOutputMIMETypes;
+    public $ConversionRules;
+    public $OutputRewriteType;
+    public $Filters;
+    public $FilterMap;
+    public $SupportImageFilters;
+    public $MIMETagMap;
+    public $IsEnabled;
+
     public function __construct( $handlerName, $isEnabled = true, $outputRewriteType = self::REPLACE_SUFFIX,
                                   $supportedInputMIMETypes = false, $supportedOutputMIMETypes = false,
                                   $conversionRules = false, $filters = false, $mimeTagMap = false)
@@ -155,7 +169,7 @@ class eZImageShellHandler extends eZImageHandler
                 $inputMimeList = $ini->variable( $iniGroup, 'InputMIMEList' );
             if ( $ini->hasVariable( $iniGroup, 'OutputMIMEList' ) )
                 $outputMimeList = $ini->variable( $iniGroup, 'OutputMIMEList' );
-            $qualityParameters = false;
+            $qualityParameters = array();
             if ( $ini->hasVariable( $iniGroup, 'QualityParameters' ) )
             {
                 $qualityParametersRaw = $ini->variable( $iniGroup, 'QualityParameters' );
@@ -165,8 +179,7 @@ class eZImageShellHandler extends eZImageHandler
                     $qualityParameters[$elements[0]] = $elements[1];
                 }
             }
-
-            $frameRangeParameters = false;
+            $frameRangeParameters = array();
             if ( $ini->hasVariable( $iniGroup, 'FrameRangeParameters' ) )
             {
                 foreach ( $ini->variable( $iniGroup, 'FrameRangeParameters' ) as $frameRangeParameter )
@@ -270,6 +283,11 @@ class eZImageShellHandler extends eZImageHandler
     public $Executable;
     public $PreParameters;
     public $PostParameters;
+
+    public $ExecutableWin32;
+    public $ExecutableMac;
+    public $ExecutableUnix;
+
 }
 
 ?>

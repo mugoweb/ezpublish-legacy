@@ -17,6 +17,7 @@
 
 class eZCodePage
 {
+    public $ReadExtraMap;
     const CACHE_CODE_DATE = 1028204478;
     
     /**
@@ -524,7 +525,7 @@ class eZCodePage
 
         if ( !file_exists( $file ) )
         {
-            eZDebug::writeWarning( "Couldn't load codepage file $file", "eZCodePage" );
+            eZDebug::writeWarning( "Couldn't load codepage file $file", "eZCodePage", __METHOD__ );
             return;
         }
         $file_m = filemtime( $file );

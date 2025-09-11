@@ -10,6 +10,8 @@
 
 class eZFSFileHandler implements eZClusterFileHandlerInterface
 {
+    public $Mutex;
+    public $lifetime;
     const EXPIRY_TIMESTAMP = 233366400;
 
     /**
@@ -68,7 +70,7 @@ class eZFSFileHandler implements eZClusterFileHandlerInterface
             }
             if ( !$mutex->steal() )
             {
-                eZDebug::writeWarning( "Failed to steal lock for file " . $this->filePath . " from PID $oldPid" );
+                eZDebug::writeWarning( "Failed to steal lock for file " . $this->filePath . " from PID $oldPid", __METHOD__ );
                 return false;
             }
             $mutex->setMeta( 'pid', getmypid() );
@@ -499,7 +501,7 @@ class eZFSFileHandler implements eZClusterFileHandlerInterface
         if ( $binaryData === null &&
              $fileContent === null )
         {
-            eZDebug::writeError( "Write callback need to set the 'content' or 'binarydata' entry" );
+            eZDebug::writeError( "Write callback need to set the 'content' or 'binarydata' entry", __METHOD__ );
             return null;
         }
 
@@ -961,6 +963,8 @@ class eZFSFileHandler implements eZClusterFileHandlerInterface
      */
     public function abortCacheGeneration()
     {
+        $this->_freeExclusiveLock( 'storeCache' );
+
         return true;
     }
 

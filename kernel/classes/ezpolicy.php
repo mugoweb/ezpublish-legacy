@@ -17,6 +17,16 @@
 
 class eZPolicy extends eZPersistentObject
 {
+    /**
+     * @var int
+     */
+    public $NodeID;
+    public $ID;
+    public $Limitations;
+    public $RoleID;
+    public $ModuleName;
+    public $FunctionName;
+    public $OriginalID;
     public function __construct( $row )
     {
           parent::__construct( $row );

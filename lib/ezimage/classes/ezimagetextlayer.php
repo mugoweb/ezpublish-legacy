@@ -17,6 +17,7 @@
 
 class eZImageTextLayer extends eZImageLayer
 {
+    public $TextAngle;
     public function __construct( $imageObjectRef = null, $imageObject = null,
                                   $width = false, $height = false,
                                   $font = false, $boundingBox = null, $text = null, $textAngle = 0 )
@@ -135,7 +136,7 @@ class eZImageTextLayer extends eZImageLayer
             return $Return;
         if ( !function_exists( 'ImageTTFBBox' ) )
         {
-            eZDebug::writeError( 'ImageTTFBBox function not in PHP, check PHP compilation', 'ezimagetextlayer.php' );
+            eZDebug::writeError( 'ImageTTFBBox function not in PHP, check PHP compilation', __METHOD__ );
             return $Return;
         }
         $bbox = ImageTTFBBox( $font->pointSize(), $angle, $font->realFile(), $text );

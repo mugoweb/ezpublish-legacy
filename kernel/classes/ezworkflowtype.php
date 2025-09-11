@@ -16,6 +16,7 @@
 
 class eZWorkflowType
 {
+    public $Attributes;
     const STATUS_NONE = 0;
     const STATUS_ACCEPTED = 1;
     const STATUS_REJECTED = 2;
@@ -95,7 +96,7 @@ class eZWorkflowType
             {
                 if ( class_exists( $class_name ) )
                 {
-                    $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name();
+                    $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name( $typeString, $class_name );
                 }
                 else
                 {
@@ -125,7 +126,7 @@ class eZWorkflowType
                 {
                     if ( class_exists( $class_name ) )
                     {
-                        $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name();
+                        $GLOBALS["eZWorkflowTypeObjects"][$typeString] = new $class_name( $typeString, $class_name );
                     }
                     else
                     {

@@ -16,6 +16,10 @@
  */
 class eZTemplateDesignResource extends eZTemplateFileResource
 {
+    /**
+     * @var never[]|mixed[]
+     */
+    public $KeyStack;
     const DESIGN_BASE_CACHE_NAME = 'designbase_';
 
     /**
@@ -252,6 +256,11 @@ class eZTemplateDesignResource extends eZTemplateFileResource
     */
     function handleResource( $tpl, &$resourceData, $method, &$extraParameters )
     {
+        if ( !is_array( $extraParameters ) )
+        {
+            $extraParameters = array();
+        }
+
         $path = $resourceData['template-name'];
 
         $matchKeys = $this->Keys;

@@ -665,7 +665,7 @@ class eZURLAliasML extends eZPersistentObject
 
             // First we look at the entries to mark as history entries, if an entry comprise more languages, it must not be set as history element.
             $query = "SELECT * FROM ezurlalias_ml " .
-                     "WHERE action = '{$actionStr}' AND (${bitAnd} > 0) AND is_original = 1 AND is_alias = 0 AND (parent != $parentID OR text_md5 != {$textMD5})";
+                     "WHERE action = '{$actionStr}' AND ({$bitAnd} > 0) AND is_original = 1 AND is_alias = 0 AND (parent != $parentID OR text_md5 != {$textMD5})";
             $toBeUpdated = $db->arrayQuery( $query );
 
             // 0. Check if the entry to be updated represents multiple languages:
@@ -688,7 +688,7 @@ class eZURLAliasML extends eZPersistentObject
                 {
                     // Mark as history element.
                     $query = "UPDATE ezurlalias_ml SET is_original = 0 " .
-                             "WHERE action = '{$actionStr}' AND (${bitAnd} > 0) AND is_original = 1 AND is_alias = 0 AND (parent != $parentID OR text_md5 != {$textMD5})";
+                             "WHERE action = '{$actionStr}' AND ({$bitAnd} > 0) AND is_original = 1 AND is_alias = 0 AND (parent != $parentID OR text_md5 != {$textMD5})";
                     $res = $db->query( $query );
                     if ( !$res ) return eZURLAliasML::dbError( $db );
                 }
@@ -699,7 +699,7 @@ class eZURLAliasML extends eZPersistentObject
             // if found make then link to the new entry
             $bitAnd = $db->bitAnd( 'lang_mask', $languageID );
             $query = "SELECT * FROM ezurlalias_ml " .
-                     "WHERE action = '{$actionStr}' AND (${bitAnd} > 0) AND is_original = 0 AND (parent != $parentID OR text_md5 != {$textMD5})";
+                     "WHERE action = '{$actionStr}' AND ({$bitAnd} > 0) AND is_original = 0 AND (parent != $parentID OR text_md5 != {$textMD5})";
             $rows = $db->arrayQuery( $query );
             foreach ( $rows as $row )
             {
@@ -725,7 +725,7 @@ class eZURLAliasML extends eZPersistentObject
             // Also, only to be applied on normal entries, not custom aliases
             $bitAnd = $db->bitAnd( 'lang_mask', $languageID );
             $query = "UPDATE ezurlalias_ml SET link = {$newElementID}, is_alias = 0, is_original = 0 " .
-                     "WHERE action = '{$actionStr}' AND is_original = 0 AND is_alias = 0 AND (${bitAnd} > 0) AND (parent != $parentID OR text_md5 != {$textMD5})";
+                     "WHERE action = '{$actionStr}' AND is_original = 0 AND is_alias = 0 AND ({$bitAnd} > 0) AND (parent != $parentID OR text_md5 != {$textMD5})";
             $res = $db->query( $query );
             if ( !$res ) return eZURLAliasML::dbError( $db );
 
@@ -758,7 +758,7 @@ class eZURLAliasML extends eZPersistentObject
             {
                 $oldParentID = (int)$row['id'];
                 $query = "UPDATE ezurlalias_ml SET parent = {$newElementID} " .
-                         "WHERE parent = {$oldParentID} AND (${bitAnd} > 0)";
+                         "WHERE parent = {$oldParentID} AND ({$bitAnd} > 0)";
                 $res = $db->query( $query );
                 if ( !$res ) return eZURLAliasML::dbError( $db );
             }
@@ -1178,7 +1178,7 @@ class eZURLAliasML extends eZPersistentObject
                 // Check for a valid path
                 if ( $lastID !== false && $lastID != $paren )
                 {
-                    eZDebug::writeError( "The parent ID $paren of element with ID $id does not point to the last entry which had ID $lastID, incorrect path would be calculated, aborting" );
+                    eZDebug::writeError( "The parent ID $paren of element with ID $id does not point to the last entry which had ID $lastID, incorrect path would be calculated, aborting", __METHOD__ );
                     return null;
                 }
                 $lastID = $id;
@@ -1768,7 +1768,7 @@ class eZURLAliasML extends eZPersistentObject
                     }
                     else
                     {
-                        eZDebug::writeError( "Lookup of parent ID $paren failed, cannot perform reverse lookup of alias." );
+                        eZDebug::writeError( "Lookup of parent ID $paren failed, cannot perform reverse lookup of alias.", __METHOD__ );
                         return false;
                     }
                 }
@@ -2055,7 +2055,7 @@ class eZURLAliasML extends eZPersistentObject
     {
         if ( !preg_match( "#^([a-zA-Z0-9_]+):(.+)?$#", $action, $matches ) )
         {
-            eZDebug::writeError( "Action is not of valid syntax '{$action}'" );
+            eZDebug::writeError( "Action is not of valid syntax '{$action}'", __METHOD__ );
             return false;
         }
 
@@ -2068,7 +2068,7 @@ class eZURLAliasML extends eZPersistentObject
             case 'eznode':
                 if ( !is_numeric( $args ) )
                 {
-                    eZDebug::writeError( "Arguments to eznode action must be an integer, got '{$args}'" );
+                    eZDebug::writeError( "Arguments to eznode action must be an integer, got '{$args}'", __METHOD__ );
                     return false;
                 }
                 $url = 'content/view/full/' . $args;
@@ -2084,7 +2084,7 @@ class eZURLAliasML extends eZPersistentObject
                 break;
 
             default:
-                eZDebug::writeError( "Unknown action type '{$type}', cannot handle it" );
+                eZDebug::writeError( "Unknown action type '{$type}', cannot handle it", __METHOD__ );
                 return false;
         }
         return $url;

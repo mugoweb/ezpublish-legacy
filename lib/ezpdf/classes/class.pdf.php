@@ -17,6 +17,11 @@
 class Cpdf
 {
 
+    public $ez;
+    /**
+     * @var int
+     */
+    public $nCallBack;
     /**
      * the current number of pdf objects in the document
      */
@@ -3743,7 +3748,7 @@ class Cpdf
         }
         if ( $error )
         {
-            eZDebug::writeError( 'Adding PNG file, '. $file .', to PDF failed: '.$errormsg, 'Cpdf::addPngFromFile' );
+            eZDebug::writeError( 'Adding PNG file, '. $file .', to PDF failed: '.$errormsg, __METHOD__ );
             $this->addMessage('PNG error - ('.$file.') '.$errormsg);
             return false;
         }
@@ -3902,7 +3907,7 @@ class Cpdf
      *
      * @access private
      */
-    function addJpegImage_common( &$data, $x, $y, $w = 0, $h = 0, $imageWidth, $imageHeight, $channels = 3 )
+    function addJpegImage_common( &$data, $x, $y, $w = 0, $h = 0, $imageWidth = 0, $imageHeight = 0, $channels = 3 )
     {
         // note that this function is not to be called externally
         // it is just the common code between the GD and the file options

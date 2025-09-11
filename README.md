@@ -1,4 +1,4 @@
-eZ Publish 4 (Referred to as `legacy` in eZ Publish 5.x)
+eZ Publish fork maintained by mugo.ca
 =======================================================
 
 [![Build Status](https://img.shields.io/travis/ezsystems/ezpublish-legacy.svg?style=flat-square&branch=master)](https://travis-ci.org/ezsystems/ezpublish-legacy)
@@ -24,7 +24,7 @@ access to the Internet.
 
 Installation
 ------------
-Read [doc/INSTALL.md](doc/INSTALL.md) or go to http://doc.ez.no/eZ-Publish
+Read [doc/INSTALL.md](doc/INSTALL.md)
 
 How to upgrade and use the lovestack version
 --
@@ -69,6 +69,7 @@ Main eZ Publish features
 - Database abstraction layer
 - MVC architecture
 - Support for highly available and scalable configurations (multi-server clusters)
+- Support for the latest Image and Video File Formats (webp, webm, png, jpeg, etc)
 - XML handling and parsing library
 - SOAP communication library
 - Localisation and internationalisation libraries
@@ -86,11 +87,11 @@ Main eZ Publish features
 
 Issue tracker
 -------------
-Submitting bugs, improvements and stories is possible on https://jira.ez.no/browse/EZP.
-If you discover a security issue, please see how to responsibly report such issues on https://doc.ez.no/Security.
+Submitting bugs, improvements and stories is possible on [https://github.com/mugoweb/ezpublish-legacy/issues](https://github.com/mugoweb/ezpublish-legacy/issues).
+
+If you discover a security issue, please responsibly report such issues.
 
 
 Where to get more help
 ----------------------
-eZ Publish documentation: http://doc.ez.no/eZ-Publish
-eZ Publish forums: http://share.ez.no/forums/
+eZ Publish documentation: [https://ezpublishdoc.mugo.ca/eZ-Publish/index.html](https://ezpublishdoc.mugo.ca/eZ-Publish/index.html)

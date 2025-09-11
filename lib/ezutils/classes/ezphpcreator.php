@@ -51,6 +51,9 @@ $php->close();
 
 class eZPHPCreator
 {
+    public $FilePrefix;
+    public $TemporaryCounter;
+    public $ClusterHandler;
     const VARIABLE = 1;
     const SPACE = 2;
     const TEXT = 3;
@@ -565,7 +568,7 @@ $php->addInclude( 'lib/ezutils/classes/ezphpcreator.php' );
                 $column += strlen( $text );
                 $valueKeys = array_keys( $value );
                 $isIndexed = true;
-                for ( $i = 0, $count = count( $valueKeys ); $i < $count; ++$i )
+                for ( $i = 0; $i < count( $valueKeys ); ++$i )
                 {
                     if ( $i !== $valueKeys[$i] )
                     {
@@ -676,7 +679,7 @@ $php->addInclude( 'lib/ezutils/classes/ezphpcreator.php' );
             $column += strlen( $text );
             $valueKeys = array_keys( $value );
             $isIndexed = true;
-            for ( $i = 0, $count = count( $valueKeys ); $i < $count; ++$i )
+            for ( $i = 0; $i < count( $valueKeys ); ++$i )
             {
                 if ( $i !== $valueKeys[$i] )
                 {
@@ -782,7 +785,7 @@ $php->addInclude( 'lib/ezutils/classes/ezphpcreator.php' );
             $perm = octdec( $ini->variable( 'FileSettings', 'StorageFilePermissions' ) );
             $this->FileResource = @fopen( $this->FilePrefix . $path, "w" );
             if ( !$this->FileResource )
-                eZDebug::writeError( "Could not open file '$path' for writing, perhaps wrong permissions" );
+                eZDebug::writeError( "Could not open file '$path' for writing, perhaps wrong permissions", __METHOD__ );
             if ( $this->FileResource and
                  !$pathExisted )
                 chmod( $path, $perm );
@@ -1282,9 +1285,11 @@ print( $values['MyValue'] );
             if ( isset( $parameters['spacing'] ) and $this->Spacing )
                 $spacing = $parameters['spacing'];
             $text = 'unset( ';
-            array_walk( $variableNames, function ( &$variableName ) {
-                $variableName = "\$" . $variableName;
-            });
+            foreach( $variableNames as $k => $variableName )
+            {
+                $variableName="\$".$variableName;
+                $variableNames[ $k ] = $variableName;
+            }
             $text .= join( ', ', $variableNames );
             $text .= " );\n";
             $text = eZPHPCreator::prependSpacing( $text, $spacing );

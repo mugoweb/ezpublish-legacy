@@ -16,6 +16,8 @@
 
 class eZCollaborationItemStatus extends eZPersistentObject
 {
+    public $UserID;
+    public $CollaborationID;
     static function definition()
     {
         return array( 'fields' => array( 'collaboration_id' => array( 'name' => 'CollaborationID',
@@ -104,7 +106,7 @@ class eZCollaborationItemStatus extends eZPersistentObject
                                                                                    'is_read' => 1 ) );
     }
 
-    static function updateFields( $collaborationID, $userID = false, $fields )
+    static function updateFields( $collaborationID, $userID = false, $fields = array())
     {
         if ( $userID === false )
             $userID = eZUser::currentUserID();

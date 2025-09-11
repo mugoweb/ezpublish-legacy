@@ -15,6 +15,15 @@
  */
 class eZContentObject extends eZPersistentObject
 {
+    public $Permissions;
+    public $ContentObject;
+    public $ContentObjectAttributeArray;
+    public $CurrentVersion;
+    public $OwnerID;
+    public $ClassID;
+    public $InitialLanguageID;
+    public $LanguageMask;
+    public $SectionID;
     const STATUS_DRAFT = 0;
     const STATUS_PUBLISHED = 1;
     const STATUS_ARCHIVED = 2;
@@ -874,6 +883,11 @@ class eZContentObject extends eZPersistentObject
      */
     static function fetch( $id, $asObject = true )
     {
+        if ( is_array( $id ) )
+        {
+            $id = '';
+        }
+
         global $eZContentObjectContentObjectCache;
 
         // If the object given by its id is not cached or should be returned as array
@@ -3281,26 +3295,26 @@ class eZContentObject extends eZPersistentObject
                         ezcontentclass.identifier as contentclass_identifier,
                         ezcontentclass.is_container as is_container,
                         ezcontentobject.*, ezcontentobject_name.name as name, ezcontentobject_name.real_translation
-                        $sortingInfo[attributeTargetSQL]
+                        {$sortingInfo['attributeTargetSQL']}
                      FROM
                         ezcontentclass,
                         ezcontentobject,
                         ezcontentobject_link,
                         ezcontentobject_name
-                        $sortingInfo[attributeFromSQL]
+                        {$sortingInfo['attributeFromSQL']}
                      WHERE
                         ezcontentclass.id=ezcontentobject.contentclass_id AND
                         ezcontentclass.version=0 AND
                         ezcontentobject.status=" . eZContentObject::STATUS_PUBLISHED . " AND
-                        $sortingInfo[attributeWhereSQL]
-                        $relatedClassIdentifiersSQL
-                        $relationTypeMasking
-                        $fromOrToContentObjectID
-                        $showInvisibleNodesCond AND
+                        {$sortingInfo['attributeWhereSQL']}
+                        {$relatedClassIdentifiersSQL}
+                        {$relationTypeMasking}
+                        {$fromOrToContentObjectID}
+                        {$showInvisibleNodesCond} AND
                         ezcontentobject.id = ezcontentobject_name.contentobject_id AND
                         ezcontentobject.current_version = ezcontentobject_name.content_version AND
                         " . eZContentLanguage::sqlFilter( 'ezcontentobject_name', 'ezcontentobject' ) . "
-                        $sortingString";
+                        {$sortingString}";
         if ( !$offset && !$limit )
         {
             $relatedObjects = $db->arrayQuery( $query );
@@ -3936,11 +3950,12 @@ class eZContentObject extends eZPersistentObject
     }
 
     /**
-     * Returns the main node id for the current object and sets the attribute MainNodeID in the current object
+     * Returns the main node id for the current object and
+     * sets the attribute MainNodeID in the current object
      *
      * @return int|null
      */
-    function mainNodeID()
+    public function mainNodeID()
     {
         if ( !is_numeric( $this->MainNodeID ) )
         {
@@ -3951,11 +3966,11 @@ class eZContentObject extends eZPersistentObject
     }
 
     /**
-     * Returns the main node id for the current object.
+     * Returns the main node for the current object.
      *
-     * @return int|null
+     * @return eZContentObjectTreeNode|null
      */
-    function mainNode()
+    public function mainNode()
     {
         return eZContentObjectTreeNode::findMainNode( $this->attribute( 'id' ), true );
     }
@@ -4926,11 +4941,11 @@ class eZContentObject extends eZPersistentObject
         if ( $fetchAll )
         {
             // If $asObject is true we fetch all fields in class
-            $fields = $asObject ? "cc.*, $classNameFilter[nameField]" : "cc.id, $classNameFilter[nameField]";
-            $rows = $db->arrayQuery( "SELECT DISTINCT $fields " .
-                                     "FROM ezcontentclass cc$filterTableSQL, $classNameFilter[from] " .
-                                     "WHERE cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " $filterSQL AND $classNameFilter[where] " .
-                                     "ORDER BY $classNameFilter[nameField] ASC" );
+            $fields = $asObject ? "cc.*, {$classNameFilter['nameField']}" : "cc.id, {$classNameFilter['nameField']}";
+            $rows = $db->arrayQuery( "SELECT DISTINCT {$fields} " .
+                                     "FROM ezcontentclass cc{$filterTableSQL}, {$classNameFilter['from']} " .
+                                     "WHERE cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " {$filterSQL} AND {$classNameFilter['where']} " .
+                                     "ORDER BY {$classNameFilter['nameField']} ASC" );
             $classList = eZPersistentObject::handleRows( $rows, 'eZContentClass', $asObject );
         }
         else
@@ -4943,12 +4958,12 @@ class eZContentObject extends eZPersistentObject
 
             $classIDCondition = $db->generateSQLINStatement( $classIDArray, 'cc.id' );
             // If $asObject is true we fetch all fields in class
-            $fields = $asObject ? "cc.*, $classNameFilter[nameField]" : "cc.id, $classNameFilter[nameField]";
-            $rows = $db->arrayQuery( "SELECT DISTINCT $fields " .
-                                     "FROM ezcontentclass cc$filterTableSQL, $classNameFilter[from] " .
-                                     "WHERE $classIDCondition AND" .
-                                     "      cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " $filterSQL AND $classNameFilter[where] " .
-                                     "ORDER BY $classNameFilter[nameField] ASC" );
+            $fields = $asObject ? "cc.*, {$classNameFilter['nameField']}" : "cc.id, {$classNameFilter['nameField']}";
+            $rows = $db->arrayQuery( "SELECT DISTINCT {$fields} " .
+                                     "FROM ezcontentclass cc{$filterTableSQL}, {$classNameFilter['from']} " .
+                                     "WHERE {$classIDCondition} AND" .
+                                     "      cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " {$filterSQL} AND {$classNameFilter['where']} " .
+                                     "ORDER BY {$classNameFilter['nameField']} ASC" );
             $classList = eZPersistentObject::handleRows( $rows, 'eZContentClass', $asObject );
         }
 

@@ -18,6 +18,10 @@
 
 class eZContentClass extends eZPersistentObject
 {
+    public $DataMap;
+    public $RemoteID;
+    public $InGroupIDs;
+    public $URLAliasName;
     const VERSION_STATUS_DEFINED = 0;
     const VERSION_STATUS_TEMPORARY = 1;
     const VERSION_STATUS_MODIFIED = 2;
@@ -518,11 +522,11 @@ class eZContentClass extends eZPersistentObject
         if ( $fetchAll )
         {
             // If $asObject is true we fetch all fields in class
-            $fields = $asObject ? "cc.*, $classNameFilter[nameField]" : "cc.id, $classNameFilter[nameField]";
-            $rows = $db->arrayQuery( "SELECT DISTINCT $fields " .
-                                     "FROM ezcontentclass cc$filterTableSQL, $classNameFilter[from] " .
+            $fields = $asObject ? "cc.*, {$classNameFilter['nameField']}" : "cc.id, {$classNameFilter['nameField']}";
+            $rows = $db->arrayQuery( "SELECT DISTINCT {$fields} " .
+                                     "FROM ezcontentclass cc{$filterTableSQL}, {$classNameFilter['from']} " .
                                      "WHERE cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " $filterSQL " .
-                                     "ORDER BY $classNameFilter[nameField] ASC" );
+                                     "ORDER BY {$classNameFilter['nameField']} ASC" );
             $classList = eZPersistentObject::handleRows( $rows, 'eZContentClass', $asObject );
         }
         else
@@ -535,12 +539,12 @@ class eZContentClass extends eZPersistentObject
 
             $classIDCondition = $db->generateSQLINStatement( $classIDArray, 'cc.id' );
             // If $asObject is true we fetch all fields in class
-            $fields = $asObject ? "cc.*, $classNameFilter[nameField]" : "cc.id, $classNameFilter[nameField]";
-            $rows = $db->arrayQuery( "SELECT DISTINCT $fields " .
-                                     "FROM ezcontentclass cc$filterTableSQL, $classNameFilter[from] " .
+            $fields = $asObject ? "cc.*, {$classNameFilter['nameField']}" : "cc.id, {$classNameFilter['nameField']}";
+            $rows = $db->arrayQuery( "SELECT DISTINCT {$fields} " .
+                                     "FROM ezcontentclass cc{$filterTableSQL}, {$classNameFilter['from']} " .
                                      "WHERE $classIDCondition AND" .
-                                     "      cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " $filterSQL " .
-                                     "ORDER BY $classNameFilter[nameField] ASC" );
+                                     "      cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . " {$filterSQL} " .
+                                     "ORDER BY {$classNameFilter['nameField']} ASC" );
             $classList = eZPersistentObject::handleRows( $rows, 'eZContentClass', $asObject );
         }
 
@@ -680,11 +684,11 @@ class eZContentClass extends eZPersistentObject
         $classList = array();
         $db = eZDB::instance();
         // If $asObject is true we fetch all fields in class
-        $fields = $asObject ? "cc.*" : "cc.id, $classNameFilter[nameField]";
-        $rows = $db->arrayQuery( "SELECT DISTINCT $fields " .
-                                 "FROM ezcontentclass cc$filterTableSQL, $classNameFilter[from] " .
-                                 "WHERE cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . "$filterSQL AND $classNameFilter[where]" .
-                                 "ORDER BY $classNameFilter[nameField] ASC" );
+        $fields = $asObject ? "cc.*" : "cc.id, {$classNameFilter['nameField']}";
+        $rows = $db->arrayQuery( "SELECT DISTINCT {$fields} " .
+                                 "FROM ezcontentclass cc{$filterTableSQL}, {$classNameFilter['from']} " .
+                                 "WHERE cc.version = " . eZContentClass::VERSION_STATUS_DEFINED . "{$filterSQL} AND {$classNameFilter['where']}" .
+                                 "ORDER BY {$classNameFilter['nameField']} ASC" );
 
         $classList = eZPersistentObject::handleRows( $rows, 'eZContentClass', $asObject );
         return $classList;
@@ -1404,10 +1408,14 @@ You will need to change the class of the node by using the swap functionality.' 
         {
             $length = self::CONTENT_OBJECT_NAME_MAX_LENGTH;
         }
-        $nameResolver = new eZNamePatternResolver( $contentObjectNamePattern, $contentObject, $version, $translation );
-        $contentObjectName = $nameResolver->resolveNamePattern( $length, $sequence );
 
-        return $contentObjectName;
+        return eZNamePatternResolver::instance( $contentObjectNamePattern )->resolveNamePattern(
+            $contentObject,
+            $version,
+            $translation,
+            $length,
+            $sequence
+        );
     }
 
     /**
@@ -1431,51 +1439,13 @@ You will need to change the class of the node by using the swap functionality.' 
         }
 
         $length = (int) eZINI::instance()->variable('URLTranslator', 'UrlAliasNameLimit');
-        $nameResolver = new eZNamePatternResolver( $urlAliasNamePattern, $contentObject, $version, $translation );
-        $urlAliasName = $nameResolver->resolveNamePattern( $length );
 
-        return $urlAliasName;
-    }
-
-    /*!
-     Generates a name for the content object based on the content object name pattern
-     and data map of an object.
-    */
-    function buildContentObjectName( $contentObjectName, $dataMap, $tmpTags = false )
-    {
-        preg_match_all( "|<[^>]+>|U",
-                        $contentObjectName,
-                        $tagMatchArray );
-
-        foreach ( $tagMatchArray[0] as $tag )
-        {
-            $tagName = str_replace( "<", "", $tag );
-            $tagName = str_replace( ">", "", $tagName );
-
-            $tagParts = explode( '|', $tagName );
-
-            $namePart = "";
-            foreach ( $tagParts as $name )
-            {
-                // get the value of the attribute to use in name
-                if ( isset( $dataMap[$name] ) )
-                {
-                    $namePart = $dataMap[$name]->title();
-                    if ( $namePart != "" )
-                        break;
-                }
-                elseif ( $tmpTags && isset( $tmpTags[$name] ) && $tmpTags[$name] != '' )
-                {
-                    $namePart = $tmpTags[$name];
-                    break;
-                }
-
-            }
-
-            // replace tag with object name part
-            $contentObjectName = str_replace( $tag, $namePart, $contentObjectName );
-        }
-        return $contentObjectName;
+        return eZNamePatternResolver::instance( $urlAliasNamePattern )->resolveNamePattern(
+            $contentObject,
+            $version,
+            $translation,
+            $length
+        );
     }
 
     /*!

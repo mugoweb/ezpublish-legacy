@@ -39,13 +39,17 @@ class eZMatrixType extends eZDataType
         $data = false;
         if ( $http->hasPostVariable( $base . '_ezmatrix_cell_' . $contentObjectAttribute->attribute( 'id' ) ) )
             $data = $http->PostVariable( $base . '_ezmatrix_cell_' . $contentObjectAttribute->attribute( 'id' ) );
+        $dataCount = is_countable( $data ) ? count( $data ) : 0;
         $count = 0;
-        for ( $i = 0; $i < count( $data ); ++$i )
+        if ( is_array( $data ) )
+        {
+        for ( $i = 0; $i < $dataCount; ++$i )
              if ( trim( $data[$i] ) <> '' )
              {
                  ++$count;
                  break;
              }
+        }
         if ( $contentObjectAttribute->validateIsRequired() and ( $count == 0 or $data === false ) )
         {
             $contentObjectAttribute->setValidationError( ezpI18n::tr( 'kernel/classes/datatypes',
@@ -194,7 +198,7 @@ class eZMatrixType extends eZDataType
             }break;
             default :
             {
-                eZDebug::writeError( 'Unknown custom HTTP action: ' . $action, 'eZMatrixType' );
+                eZDebug::writeError( 'Unknown custom HTTP action: ' . $action, __METHOD__ );
             }break;
         }
     }
@@ -372,7 +376,7 @@ class eZMatrixType extends eZDataType
             }break;
             default :
             {
-                eZDebug::writeError( 'Unknown custom HTTP action: ' . $action, 'eZEnumType' );
+                eZDebug::writeError( 'Unknown custom HTTP action: ' . $action, __METHOD__ );
             }break;
         }
     }

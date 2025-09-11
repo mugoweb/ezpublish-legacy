@@ -19,6 +19,23 @@
 
 class eZTemplateStringOperator
 {
+    public $phpMap;
+    public $customMap;
+    public $BreakName;
+    public $Count_charsName;
+    public $DowncaseName;
+    public $UpcaseName;
+    public $UpfirstName;
+    public $UpwordName;
+    public $Count_wordsName;
+    public $ChrName;
+    public $OrdName;
+    public $PadName;
+    public $ShortenName;
+    public $SimplifyName;
+    public $TrimName;
+    public $WrapName;
+    public $WashName;
     public function __construct()
     {
         $this->Operators = array( 'upcase', 'downcase',
@@ -383,7 +400,7 @@ class eZTemplateStringOperator
         {
             case "xhtml":
             {
-                $operatorValue = htmlspecialchars( $operatorValue );
+                $operatorValue = htmlspecialchars( (string) $operatorValue );
             } break;
 
             case "email":
@@ -394,7 +411,7 @@ class eZTemplateStringOperator
                 $operatorValue = str_replace(
                     array( '.', '@' ),
                     array( $dotText, $atText ),
-                    htmlspecialchars( $operatorValue )
+                    htmlspecialchars( (string) $operatorValue )
                 );
             } break;
 
@@ -462,7 +479,7 @@ class eZTemplateStringOperator
         else if ( ( $paramCount == 1 ) || ( ( $paramCount == 2 ) && isset( $staticValues[1] ) && ( $staticValues[1] == 'xhtml' ) ) )
         {
             $values[] = $parameters[0];
-            $code = "%output% = htmlspecialchars( %1% );\n";
+            $code = "%output% = htmlspecialchars( (string) %1% );\n";
         }
         /* PDF: Type is static, input is not static */
         else if ( ( $paramCount == 2 ) && isset( $staticValues[1] ) && ( $staticValues[1] == 'pdf' ) )
@@ -480,7 +497,7 @@ class eZTemplateStringOperator
             $atText = addcslashes( $ini->variable( 'WashSettings', 'EmailAtText' ), "'" );
 
             $values[] = $parameters[0];
-            $code = "%output% = str_replace( array( '.', '@' ), array( '$dotText', '$atText' ), htmlspecialchars( %1% ) );\n";
+            $code = "%output% = str_replace( array( '.', '@' ), array( '$dotText', '$atText' ), htmlspecialchars( (string) %1% ) );\n";
         }
         /* JAVASCRIPT: Type is static, input is not static */
         else if ( ( $paramCount == 2 ) && isset( $staticValues[1] ) && ( $staticValues[1] == 'javascript' ) )
@@ -539,7 +556,7 @@ class eZTemplateStringOperator
             case $this->Count_charsName:
             {
                 $funcName = function_exists( 'mb_strlen' ) ? 'mb_strlen' : 'strlen';
-                $operatorValue = $funcName( $operatorValue );
+                $operatorValue = $funcName( (string) $operatorValue );
             }break;
 
             // Insert HTML line breaks before newlines.
@@ -638,9 +655,9 @@ class eZTemplateStringOperator
             case $this->TrimName:
             {
                 if ( $namedParameters['chars_to_remove'] === false )
-                    $operatorValue = trim( $operatorValue );
+                    $operatorValue = trim( (string) $operatorValue );
                 else
-                    $operatorValue = trim( $operatorValue, $namedParameters['chars_to_remove'] );
+                    $operatorValue = trim( (string) $operatorValue, $namedParameters['chars_to_remove'] );
             }break;
 
             // Pad...
@@ -719,6 +736,8 @@ class eZTemplateStringOperator
             // Default case: something went wrong - unknown things...
             default:
             {
+                if ( !isset( $type ) )
+                    $type = '';
                 $tpl->warning( $operatorName, "Unknown string type '$type'", $placement );
             } break;
         }

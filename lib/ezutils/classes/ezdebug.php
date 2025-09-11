@@ -55,12 +55,14 @@
 
 class eZDebug
 {
+    public $StoreLog;
     const LEVEL_NOTICE = 1;
     const LEVEL_WARNING = 2;
     const LEVEL_ERROR = 3;
     const LEVEL_TIMING_POINT = 4;
     const LEVEL_DEBUG = 5;
     const LEVEL_STRICT = 6;
+    const LEVEL_DEPRECATED = 7;
 
     const SHOW_NOTICE = 1; // 1 << (EZ_LEVEL_NOTICE - 1)
     const SHOW_WARNING = 2; // 1 << (EZ_LEVEL_WARNING - 1)
@@ -68,7 +70,8 @@ class eZDebug
     const SHOW_TIMING_POINT = 8; // 1 << (EZ_LEVEL_TIMING_POINT - 1)
     const SHOW_DEBUG = 16; // 1 << (EZ_LEVEL_DEBUG - 1)
     const SHOW_STRICT = 32; // 1 << (EZ_LEVEL_STRICT - 1)
-    const SHOW_ALL = 63; // EZ_SHOW_NOTICE | EZ_SHOW_WARNING | EZ_SHOW_ERROR | EZ_SHOW_TIMING_POINT | EZ_SHOW_DEBUG | EZ_SHOW_STRICT
+    const SHOW_DEPRECATED = 64;
+    const SHOW_ALL = 127; // EZ_SHOW_NOTICE | EZ_SHOW_WARNING | EZ_SHOW_ERROR | EZ_SHOW_TIMING_POINT | EZ_SHOW_DEBUG | EZ_SHOW_STRICT | SHOW_DEPRECATED
 
     const HANDLE_NONE = 0;
     const HANDLE_FROM_PHP = 1;
@@ -92,7 +95,9 @@ class eZDebug
                                       self::LEVEL_WARNING => array(),
                                       self::LEVEL_ERROR => array(),
                                       self::LEVEL_DEBUG => array(),
-                                      self::LEVEL_STRICT => array() );
+                                      self::LEVEL_STRICT => array(),
+                                      self::LEVEL_DEPRECATED => array(),
+        );
 
         $this->OutputFormat = array( self::LEVEL_NOTICE => array( "color" => "green",
                                                                'style' => 'notice',
@@ -127,7 +132,10 @@ class eZDebug
                                  self::LEVEL_DEBUG => array( "var/log/",
                                                           "debug.log" ),
                                  self::LEVEL_STRICT => array( 'var/log/',
-                                                           'strict.log' ) );
+                                                           'strict.log' ),
+                                 self::LEVEL_DEPRECATED => array( 'var/log/',
+                                                           'deprecated.log' ),
+        );
         $this->MessageTypes = array( self::LEVEL_NOTICE,
                                      self::LEVEL_WARNING,
                                      self::LEVEL_ERROR,
@@ -145,13 +153,17 @@ class eZDebug
                                        self::LEVEL_ERROR => true,
                                        self::LEVEL_TIMING_POINT => true,
                                        self::LEVEL_DEBUG => true,
-                                       self::LEVEL_STRICT => true );
+                                       self::LEVEL_STRICT => true,
+                                       self::LEVEL_DEPRECATED => true,
+        );
         $this->AlwaysLog = array( self::LEVEL_NOTICE => false,
                                   self::LEVEL_WARNING => false,
                                   self::LEVEL_ERROR => true, // Error is on by default, due to its importance
                                   self::LEVEL_TIMING_POINT => false,
                                   self::LEVEL_DEBUG => false,
-                                  self::LEVEL_STRICT => false );
+                                  self::LEVEL_STRICT => false,
+                                  self::LEVEL_DEPRECATED => false,
+        );
         $this->GlobalLogFileEnabled = true;
         if ( isset( $GLOBALS['eZDebugLogFileEnabled'] ) )
         {
@@ -177,7 +189,9 @@ class eZDebug
                                       self::LEVEL_WARNING => array(),
                                       self::LEVEL_ERROR => array(),
                                       self::LEVEL_DEBUG => array(),
-                                      self::LEVEL_STRICT => array() );
+                                      self::LEVEL_STRICT => array(),
+				      self::LEVEL_DEPRECATED => array(),
+        );
         $this->TimeAccumulatorList = array();
         $this->TimeAccumulatorGroupList = array();
         $this->topReportsList = array();
@@ -378,10 +392,14 @@ class eZDebug
             case 'E_CORE_WARNING':
             case 'E_COMPILE_WARNING':
             case 'E_USER_WARNING':
+            {
+                $this->writeWarning( $str, 'PHP: ' . $errname );
+            } break;
+
             case 'E_DEPRECATED':
             case 'E_USER_DEPRECATED':
             {
-                $this->writeWarning( $str, 'PHP: ' . $errname );
+                $this->writeDeprecated( $str, 'PHP: ' . $errname );
             } break;
 
             case 'E_NOTICE':
@@ -530,6 +548,55 @@ class eZDebug
         else
         {
             $debug->write( $string, self::LEVEL_WARNING, $label, $backgroundClass, $alwaysLog );
+        }
+    }
+
+    /**
+     * Deprecated used to be a warning in previous versions of ezp.
+     * But with the increased amount of Deprecated errors it was necessary
+     * to handle them separately otherwise the system is running out of memory.
+     * In PHP 8, there are a lot of potential deprecation error messages.
+     */
+    static function writeDeprecated( $string, $label = "", $backgroundClass = "" )
+    {
+        $alwaysLog = eZDebug::alwaysLogMessage( self::LEVEL_DEPRECATED );
+        $enabled = eZDebug::isDebugEnabled();
+        if ( !$alwaysLog and !$enabled )
+            return;
+
+        $show = eZDebug::showMessage( self::SHOW_DEPRECATED );
+        if ( !$alwaysLog and !$show )
+            return;
+
+        if ( is_object( $string ) || is_array( $string ) )
+            $string = eZDebug::dumpVariable( $string );
+
+        // Deprecated errors used to be warnings in ezp, that is why
+        // they are counted as "warning"
+        $GLOBALS['eZDebugWarning'] = true;
+        if ( !isset( $GLOBALS['eZDebugWarningCount'] ) )
+            $GLOBALS['eZDebugWarningCount'] = 0;
+        ++$GLOBALS['eZDebugWarningCount'];
+
+        $debug = eZDebug::instance();
+        if ( $debug->HandleType == self::HANDLE_TO_PHP )
+        {
+            // If we get here only because of $alwaysLog we should not trigger a PHP error
+            if ( $enabled and $show )
+            {
+                if ( $label )
+                    $string = "$label: $string";
+                trigger_error( $string, E_USER_DEPRECATED );
+            }
+        }
+        else
+        {
+            // Making sure we only log deprecated messages to the log file and not storing it
+            // for the ezdebug output due to memory limitations
+            $orgLogOnlyValue = (bool) eZDebug::isLogOnlyEnabled();
+            $GLOBALS['eZDebugLogOnly'] = true;
+            $debug->write( $string, self::LEVEL_DEPRECATED, $label, $backgroundClass, $alwaysLog );
+            $GLOBALS['eZDebugLogOnly'] = $orgLogOnlyValue;
         }
     }
 
@@ -723,6 +790,7 @@ class eZDebug
             case self::LEVEL_DEBUG:
             case self::LEVEL_TIMING_POINT:
             case self::LEVEL_STRICT:
+            case self::LEVEL_DEPRECATED:
                 break;
 
             default:
@@ -769,7 +837,7 @@ class eZDebug
                 }
                 if ( $this->isLogFileEnabled( $verbosityLevel ) )
                 {
-                    $string = "$label:\n$string";
+                    $string = "$label: $string";
                     $this->writeFile( $fileName, $string, $verbosityLevel, $alwaysLog );
                 }
             }
@@ -900,7 +968,7 @@ class eZDebug
         $logFile = @fopen( $fileName, "a" );
         if ( $logFile )
         {
-            $time = strftime( "%b %d %Y %H:%M:%S", strtotime( "now" ) );
+            $time = date( "M d Y H:i:s", strtotime( "now" ) );
             $ip = eZSys::clientIP();
             if ( !$ip )
                 $ip = eZSys::serverVariable( 'HOSTNAME', true );
@@ -1505,7 +1573,7 @@ class eZDebug
         {
             if ( !in_array( $debug['Level'], $allowedDebugLevels ) )
                 continue;
-            $time = strftime ("%b %d %Y %H:%M:%S", $debug['Time'] );
+            $time = date( "M d Y H:i:s", $debug['Time'] );
 
             $outputData = $this->OutputFormat[$debug["Level"]];
             if ( is_array( $outputData ) )
@@ -1523,13 +1591,13 @@ class eZDebug
                 $pre = ($bgclass != '' ? " class='$bgclass'" : '');
                 if ( $as_html )
                 {
-                    $label = htmlspecialchars( $label );
+                    $label = htmlspecialchars( (string) $label );
 
                     $contents = '';
                     if ( extension_loaded( 'xdebug' ) && ( strncmp( self::XDEBUG_SIGNATURE, $debug['String'], strlen( self::XDEBUG_SIGNATURE ) ) === 0 ) )
                         $contents = substr( $debug['String'], strlen( self::XDEBUG_SIGNATURE ) );
                     else
-                        $contents = htmlspecialchars( $debug['String'] );
+                        $contents = htmlspecialchars( (string) $debug['String'] );
 
                     echo "<tr class='$style'><td class='debugheader'$identifierText><b><span>$name:</span> $label</b></td>
                                     <td class='debugheader' style=\"text-align:right;\">$time</td></tr>
@@ -2034,6 +2102,16 @@ class eZDebug
     public $topReportsList;
 
     private $recursionFlag = false;
+
+    public $MessageNames;
+
+    public $AlwaysLog;
+
+    public $OldHandler;
+
+    public $TimeAccumulatorGroupList;
+
+
 }
 
 ?>

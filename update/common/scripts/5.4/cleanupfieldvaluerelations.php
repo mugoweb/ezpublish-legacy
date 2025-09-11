@@ -133,6 +133,12 @@ else
 
 function processRelationListRow( array $row )
 {
+    // Do not process empty data
+    if(empty($row["data_text"]))
+    {
+        return [];
+    }
+
     $db = eZDB::instance();
 
     $document = new DOMDocument( "1.0", "utf-8" );

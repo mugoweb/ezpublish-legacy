@@ -22,6 +22,23 @@
 
 class eZImageGDHandler extends eZImageHandler
 {
+    public $InputMap;
+    public $OutputMap;
+    public $OutputQualityMap;
+    public $FilterFunctionMap;
+    public $LuminanceColorScales;
+    public $ThresholdList;
+    public $HandlerName;
+    public $SupportedInputMIMETypes;
+    public $SupportedOutputMIMETypes;
+    public $ConversionRules;
+    public $OutputRewriteType;
+    public $Filters;
+    public $FilterMap;
+    public $SupportImageFilters;
+    public $MIMETagMap;
+    public $IsEnabled;
+
     public function __construct( $handlerName, $isGloballyEnabled,
                                $outputRewriteType = self::REPLACE_SUFFIX,
                                $conversionRules = false )
@@ -145,6 +162,14 @@ class eZImageGDHandler extends eZImageHandler
         }
 
         $currentImage = $inputFunction( $inputFile );
+
+
+        // ###PHP8PATCH check if imagefile could be loaded if not write error
+        if ( !is_object( $currentImage )  )
+        {
+            eZDebug::writeError( "Source image $inputFile can not be load with function:  $inputFunction ( inputFile )", __METHOD__ );
+            return false;
+        }
 
         $filterVariables = array( 'border-color' => array( 127, 127, 127 ),
                                   'border-size' => array( 0, 0 ) );

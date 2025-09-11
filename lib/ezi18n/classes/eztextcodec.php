@@ -21,6 +21,8 @@
 
 class eZTextCodec
 {
+    public $CodepageMapper;
+    public $Codepage;
     /**
      * @param string $inputCharsetCode
      * @param string $outputCharsetCode
@@ -205,7 +207,7 @@ class eZTextCodec
         {
             eZDebug::writeError( "Cannot create textcodec from characterset " . $this->RequestedInputCharsetCode .
                                  " to characterset " . $this->RequestedOutputCharsetCode,
-                                 "eZTextCodec" );
+                                 __METHOD__ );
             if ( !$conversionFunction )
                 $conversionFunction = $noneConversionFunction;
             if ( !$strlenFunction )
@@ -585,6 +587,18 @@ class eZTextCodec
         }
         return $realCharset;
     }
+
+    public $RequestedInputCharsetCode;
+    public $RequestedOutputCharsetCode;
+    public $InputCharsetCode;
+    public $OutputCharsetCode;
+    public $InputCharacterEncodingScheme;
+    public $OutputCharacterEncodingScheme;
+    public $ConversionFunction;
+    public $StrlenFunction;
+    public $RequireConversion;
+
+
 }
 
 ?>

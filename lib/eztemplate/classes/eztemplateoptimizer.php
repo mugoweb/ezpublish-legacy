@@ -89,7 +89,7 @@ class eZTemplateOptimizer
     {
         $ret = 0;
         /* node.object.data_map optimization */
-        if ( ( count( $data ) >= 3 ) and
+        if ( is_countable( $data ) && ( count( $data ) >= 3 ) and
              ( $data[0][0] == eZTemplate::TYPE_VARIABLE ) and
              ( $data[0][1][2] == 'node' ) and
              ( $data[1][0] == eZTemplate::TYPE_ATTRIBUTE ) and

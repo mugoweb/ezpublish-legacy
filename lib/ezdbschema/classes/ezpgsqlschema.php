@@ -49,7 +49,7 @@ class eZPgsqlSchema extends eZDBSchemaInterface
     const FETCH_TABLE_DEF_QUERY = '
         SELECT a.attname,
                pg_catalog.format_type(a.atttypid, a.atttypmod),
-               (SELECT substring(d.adsrc for 128) FROM pg_catalog.pg_attrdef d
+               (SELECT substring(pg_get_expr(d.adbin, d.adrelid) for 128) FROM pg_catalog.pg_attrdef d
                 WHERE d.adrelid = a.attrelid AND d.adnum = a.attnum AND a.atthasdef) as default,
                a.attnotnull, a.attnum
         FROM pg_catalog.pg_attribute a
@@ -395,7 +395,7 @@ class eZPgsqlSchema extends eZDBSchemaInterface
 
             case 'double precision':
                 return 'double';
-                
+
             case 'real':
                 return 'float';
 
@@ -542,7 +542,7 @@ class eZPgsqlSchema extends eZDBSchemaInterface
     /*!
      * \private
      */
-    function generateFieldDef( $table_name, $field_name, $def, $add_default_not_null = true, $params )
+    function generateFieldDef( $table_name, $field_name, $def, $add_default_not_null = true, $params = array())
     {
         $diffFriendly = isset( $params['diff_friendly'] ) ? $params['diff_friendly'] : false;
 

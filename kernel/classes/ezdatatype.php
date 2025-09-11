@@ -44,6 +44,7 @@
 
 class eZDataType
 {
+    public $Attributes;
     /**
      * Initializes the datatype with the string id $dataTypeString and the name $name.
      *
@@ -162,7 +163,7 @@ class eZDataType
             if ( !isset( $GLOBALS["eZDataTypeObjects"][$dataTypeString] ) ||
                  get_class( $GLOBALS["eZDataTypeObjects"][$dataTypeString] ) != $className )
             {
-                $GLOBALS["eZDataTypeObjects"][$dataTypeString] = new $className();
+                $GLOBALS["eZDataTypeObjects"][$dataTypeString] = new $className( $dataTypeString, $className );
             }
             return $GLOBALS["eZDataTypeObjects"][$dataTypeString];
         }
@@ -184,7 +185,7 @@ class eZDataType
             {
                 if ( !isset( $GLOBALS["eZDataTypeObjects"][$dataTypeString] ) )
                 {
-                    $GLOBALS["eZDataTypeObjects"][$dataTypeString] = new $className();
+                    $GLOBALS["eZDataTypeObjects"][$dataTypeString] = new $className( $dataTypeString, $className );
                 }
             }
             uasort( $GLOBALS["eZDataTypeObjects"], function ( $a, $b ) { return strcmp( $a->Name, $b->Name); } );
@@ -282,6 +283,16 @@ class eZDataType
      \sa insertSimpleString()
     */
     function isSimpleStringInsertionSupported()
+    {
+        return false;
+    }
+
+    /**
+     * Indicates if the datatype handles relations
+     *
+     * @return bool
+     */
+    public function isRelationType()
     {
         return false;
     }
@@ -1311,7 +1322,7 @@ class eZDataType
             {
                 eZDebug::writeWarning( "Extension '$extensionDirectory' does not have the subdirectory 'datatypes'\n" .
                                        "Looked for directory '" . $extensionPath . "'\n" .
-                                       "Cannot look for datatype '$type' in this extension." );
+                                       "Cannot look for datatype '$type' in this extension.", __METHOD__ );
             }
         }
         $foundEventType = false;

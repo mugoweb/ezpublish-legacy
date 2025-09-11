@@ -389,7 +389,7 @@ class eZExtension
             }
             else if ( $extensionSubdir )
             {
-                eZDebug::writeWarning( "Extension '$extensionDirectory' does not have the subdirectory $extensionSubdir, looked for directory '" . $extensionPath . "'" );
+                eZDebug::writeWarning( "Extension '$extensionDirectory' does not have the subdirectory $extensionSubdir, looked for directory '" . $extensionPath . "'", __METHOD__ );
             }
         }
         $foundType = false;
@@ -544,6 +544,7 @@ class eZExtension
                     // detect if class has a constructor, and if not write a notice about that
                     if ( $reflection->getConstructor() !== null )
                     {
+                        $handlerParams = array_values( $handlerParams );
                         $object = $reflection->newInstanceArgs( $handlerParams );
                     }
                     else

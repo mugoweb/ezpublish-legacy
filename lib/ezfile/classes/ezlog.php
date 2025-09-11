@@ -19,7 +19,7 @@
 class eZLog
 {
     const MAX_LOGROTATE_FILES = 3;
-    const MAX_LOGFILE_SIZE = 204800; // 200*1024
+    const MAX_LOGFILE_SIZE = 2097152; // 2MB
 
     /*!
      \static
@@ -46,13 +46,26 @@ class eZLog
         $logFile = @fopen( $fileName, "a" );
         if ( $logFile )
         {
-            $time = strftime( "%b %d %Y %H:%M:%S", strtotime( "now" ) );
-            $logMessage = "[ " . $time . " ] $message\n";
+            $ini = eZINI::instance();
+            $time = date( "M d Y H:i:s", strtotime( "now" ) );
+            $logMessage = "[ " . $time . " ]";
+            $logMessage .= "[ {$GLOBALS['eZCurrentAccess']['name']} ]";
+            if (php_sapi_name() === 'cli') {
+                $pid = getmypid();
+                $command = exec("ps -p $pid -o args=");
+                $logMessage .= '[ ' . $command . ' ]';
+            } else {
+                $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
+                $host = $_SERVER['HTTP_HOST'];
+                $uri = $_SERVER['REQUEST_URI'];
+                $url = "$scheme://$host$uri";
+                $logMessage .= '[ ' . $url . ' ]';
+            }
+            $logMessage .= " $message\n";
             @fwrite( $logFile, $logMessage );
             @fclose( $logFile );
             if ( !$fileExisted )
             {
-                $ini = eZINI::instance();
                 $permissions = octdec( $ini->variable( 'FileSettings', 'LogFilePermissions' ) );
                 @chmod( $fileName, $permissions );
             }
@@ -103,7 +116,7 @@ class eZLog
         $logFile = @fopen( $fileName, "a" );
         if ( $logFile )
         {
-            $time = strftime( "%b %d %Y %H:%M:%S", strtotime( "now" ) );
+            $time = date( "M d Y H:i:s", strtotime( "now" ) );
             $logMessage = "[ " . $time . " ] [" . $dir . $name . "]\n";
             @fwrite( $logFile, $logMessage );
             @fclose( $logFile );

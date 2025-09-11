@@ -18,6 +18,15 @@
 
 class eZOrder extends eZPersistentObject
 {
+    public $ProductCollectionID;
+    public $IgnoreVAT;
+    public $OrderNr;
+    public $ID;
+    public $UserID;
+    public $StatusID;
+    public $StatusModified;
+    public $StatusModifierID;
+    public $AccountIdentifier;
     const SHOW_NORMAL = 0;
     const SHOW_ARCHIVED = 1;
     const SHOW_ALL = 2;
@@ -210,7 +219,7 @@ class eZOrder extends eZPersistentObject
     /*!
      \return the active orders
     */
-    static function active( $asObject = true, $offset, $limit, $sortField = "created", $sortOrder = "asc", $show = eZOrder::SHOW_NORMAL )
+    static function active( $asObject = true, $offset = 0, $limit = 0, $sortField = "created", $sortOrder = "asc", $show = eZOrder::SHOW_NORMAL )
     {
         if ( $sortField == "user_name" )
         {

@@ -145,14 +145,14 @@ class eZDateTimeType extends eZDataType
 
             if ( ( $year == '' and $month == '' and $day == '' and
                    $hour == '' and $minute == '' and ( !$useSeconds or $second == '' ) ) or
-                 !checkdate( $month, $day, $year ) )
+                 !checkdate( (int)$month, (int)$day, (int)$year ) )
             {
                     $stamp = null;
             }
             else
             {
                 $dateTime = new eZDateTime();
-                $dateTime->setMDYHMS( $month, $day, $year, $hour, $minute, $second );
+                $dateTime->setMDYHMS( (int)$month, (int)$day, (int)$year, (int)$hour, (int)$minute, (int)$second );
                 $stamp = $dateTime->timeStamp();
             }
 
@@ -238,14 +238,14 @@ class eZDateTimeType extends eZDataType
             $contentClassAttribute = $contentObjectAttribute->contentClassAttribute();
             if ( ( $year == '' and $month == ''and $day == '' and
                    $hour == '' and $minute == '' and ( !$useSeconds or $second == '' ) ) or
-                 !checkdate( $month, $day, $year ) )
+                 !checkdate( (int)$month, (int)$day, (int)$year ) )
             {
                     $stamp = null;
             }
             else
             {
                 $dateTime = new eZDateTime();
-                $dateTime->setMDYHMS( $month, $day, $year, $hour, $minute, $second );
+                $dateTime->setMDYHMS( (int)$month, (int)$day, (int)$year, (int)$hour, (int)$minute, (int)$second );
                 $stamp = $dateTime->timeStamp();
             }
 

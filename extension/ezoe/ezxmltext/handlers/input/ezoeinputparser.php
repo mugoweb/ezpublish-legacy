@@ -266,7 +266,7 @@ class eZOEInputParser extends eZXMLInputParser
                     }
                     else
                     {
-                        eZDebug::writeWarning( "No namespace defined for prefix '$prefix'.", 'eZXML input parser' );
+                        eZDebug::writeWarning( "No namespace defined for prefix '$prefix'.", __METHOD__ );
                     }
                 }
                 else
@@ -999,7 +999,7 @@ class eZOEInputParser extends eZXMLInputParser
                 {
                     ++$sectionLevel;
                 }
-                elseif ( $current->nodeName === 'td' )
+                elseif ( $current->nodeName === 'td' || $current->nodeName === 'th' )
                 {
                     ++$sectionLevel;
                     break;
