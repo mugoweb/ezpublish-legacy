@@ -441,13 +441,8 @@ YUI( YUI3_config ).add('io-ez', function( Y )
         // set default sortBy value
         $sortBy = array( 'published' => 'desc' );
         $ezFindIni = eZINI::instance( "ezfind.ini" );
-        // check post variable
-        if ( self::hasPostValue( $http, 'SortByMethod' ) )
-        {
-            $sortBy = json_decode( $http->postVariable( 'SortByMethod' ), true );
-        }
         // if empty/not defined, read the value from ezfind
-        else if ( $ezFindIni->BlockValues[ 'SearchSettings' ] )
+        if ( $ezFindIni->BlockValues[ 'SearchSettings' ] )
         {
             $sortBy = $ezFindIni->variable( "SearchSettings", "SortBy" );
         }
