@@ -438,11 +438,20 @@ YUI( YUI3_config ).add('io-ez', function( Y )
         if ( self::hasPostValue( $http, 'EncodingDataMap' ) )
             $encodeParams['dataMap'] = $http->postVariable( 'EncodingDataMap' );
 
+        // set default sortBy value
+        $sortBy = array( 'published' => 'desc' );
+        $ezFindIni = eZINI::instance( "ezfind.ini" );
+        // if empty/not defined, read the value from ezfind
+        if ( $ezFindIni->BlockValues[ 'SearchSettings' ] )
+        {
+            $sortBy = $ezFindIni->variable( "SearchSettings", "SortBy" );
+        }
+
         // Prepare search parameters
         $params = array( 'SearchOffset' => $searchOffset,
                          'SearchLimit' => $searchLimit,
                          'SortArray' => array( 'published', 0 ), // Legacy search engine uses SortArray
-                         'SortBy' => array( 'published' => 'desc' ) // eZ Find search method implementation uses SortBy
+                         'SortBy' => $sortBy // eZ Find search method implementation uses SortBy
         );
 
         if ( self::hasPostValue( $http, 'SearchContentClassAttributeID' ) )
