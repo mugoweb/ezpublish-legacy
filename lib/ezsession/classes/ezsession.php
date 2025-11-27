@@ -359,6 +359,7 @@ class eZSession
         }
         $path   = $ini->hasVariable( 'Session', 'CookiePath' )     ? $ini->variable( 'Session', 'CookiePath' )     : $params['path'];
         $domain = $ini->hasVariable( 'Session', 'CookieDomain' )   ? $ini->variable( 'Session', 'CookieDomain' )   : $params['domain'];
+        $samesite = $ini->hasVariable( 'Session', 'SameSite' ) ? $ini->variable( 'Session', 'SameSite' ) : 'None';
         if ( $ini->hasVariable( 'Session', 'CookieSecure' ) )
         {
             $secure = ( $ini->variable( 'Session', 'CookieSecure' ) == 'true' ) ? true : false ;
@@ -377,7 +378,14 @@ class eZSession
             {
                 $httponly = $params['httponly'];
             }
-            session_set_cookie_params( $lifetime, $path, $domain, $secure, $httponly );
+            session_set_cookie_params([
+                'lifetime' => $lifetime,
+                'path' => $path,
+                'domain' => $domain,
+                'secure' => $secure,
+                'httponly' => $httponly,
+                'samesite' => $samesite
+            ]);
         }
         else
         {
