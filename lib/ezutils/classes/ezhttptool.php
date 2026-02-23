@@ -634,7 +634,7 @@ EOT;
 
     function createPostVarsFromImageButtons()
     {
-        foreach ( array_keys( $_POST ) as $key )
+        foreach ( array_keys( $_POST ?? [] ) as $key )
         {
             if ( substr( $key, -2 ) == '_x' )
             {
