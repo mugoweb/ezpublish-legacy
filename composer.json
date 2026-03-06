@@ -34,7 +34,6 @@
         "ext-intl": "*",
         "symfony/polyfill-php73":  "^1.9",
         "ezsystems/ezpublish-legacy-installer": "*",
-        "zetacomponents/archive": "~1.5",
         "zetacomponents/authentication": "~1.4",
         "zetacomponents/authentication-database-tiein": "~1.2",
         "zetacomponents/cache": "~1.6",
