@@ -62,11 +62,12 @@ class eZTextFileUser extends eZUser
         // if mysql
         if ( $databaseName === 'mysql' )
         {
+            $passwordHash = password_hash( $password, PASSWORD_DEFAULT  );
             $query = "SELECT contentobject_id, password_hash, password_hash_type, email, login
                       FROM ezuser, ezcontentobject
                       WHERE ( $loginText ) AND
                         ezcontentobject.status='$contentObjectStatus' AND
-                        ( ezcontentobject.id=contentobject_id OR ( password_hash_type=4 AND ( $loginText ) AND password_hash=PASSWORD('$passwordEscaped') ) )";
+                        ( ezcontentobject.id=contentobject_id OR ( password_hash_type=7 AND ( $loginText ) AND password_hash='$passwordHash' ) )";
         }
         else
         {
