@@ -149,23 +149,22 @@ class eZXMLTextType extends eZDataType
     function onPublish( $contentObjectAttribute, $object, $publishedNodes )
     {
         $currentVersion = $object->currentVersion();
-        $langMask = $currentVersion->attribute( 'language_mask' );
 
-        // We find all translations present in the current version. We calculate
-        // this from the language mask already present in the fetched version,
-        // so no further round-trip to the DB is required.
-        $languageList = eZContentLanguage::decodeLanguageMask( $langMask, true );
-        $languageList = $languageList['language_list'];
+        //Fetches all ezxmltext attributes for the given object
+        $attributeArray = eZPersistentObject::fetchObjectList(
+            eZContentObjectAttribute::definition(),
+            null,
+            array(
+                'data_type_string' => 'ezxmltext',
+                'contentobject_id' => $object->ID,
+                'version' => $currentVersion->attribute( 'version' ),
+            ),
+            null,
+            null,
+            true );
 
-        // We want to have the class attribute identifier of the attribute
-        // containing the current ezxmltext, as we then can use the more efficient
-        // eZContentObject->fetchAttributesByIdentifier() to get the data
-        $identifier = $contentObjectAttribute->attribute( 'contentclass_attribute_identifier' );
-
-        $attributeArray = $object->fetchAttributesByIdentifier( array( $identifier ),
-                                                                $currentVersion->attribute( 'version' ),
-                                                                $languageList );
-
+        // builds a list of object relations
+        $foundObjectRelations = false;
         foreach ( $attributeArray as $attribute )
         {
             $xmlText = eZXMLTextType::rawXMLText( $attribute );
@@ -194,6 +193,12 @@ class eZXMLTextType extends eZDataType
             // linked objects
             $linkedObjectIdArray = $this->getRelatedObjectList( $dom->getElementsByTagName( 'link' ) );
 
+            if ( !empty( $linkedObjectIdArray ) )
+            {
+                $foundObjectRelations = true;
+                $object->appendInputRelationList( $linkedObjectIdArray, eZContentObject::RELATION_LINK );
+            }
+
             // embedded objects
             $embeddedObjectIdArray = array_merge(
                 $this->getRelatedObjectList( $dom->getElementsByTagName( 'embed' ) ),
@@ -202,18 +207,15 @@ class eZXMLTextType extends eZDataType
 
             if ( !empty( $embeddedObjectIdArray ) )
             {
+                $foundObjectRelations = true;
                 $object->appendInputRelationList( $embeddedObjectIdArray, eZContentObject::RELATION_EMBED );
             }
+        }
 
-            if ( !empty( $linkedObjectIdArray ) )
-            {
-                $object->appendInputRelationList( $linkedObjectIdArray, eZContentObject::RELATION_LINK );
-            }
-            if ( !empty( $linkedObjectIdArray ) || !empty( $embeddedObjectIdArray ) )
-            {
-                $object->commitInputRelations( $currentVersion->attribute( 'version' ) );
-            }
-
+        // write object relations for this version
+        if ( $foundObjectRelations )
+        {
+            $object->commitInputRelations( $currentVersion->attribute( 'version' ) );
         }
     }
 
