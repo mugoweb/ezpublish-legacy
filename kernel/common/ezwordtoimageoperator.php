@@ -85,8 +85,7 @@ class eZWordToImageOperator
                 }
 
                 $ini = eZINI::instance( 'icon.ini' );
-                $repository = $ini->variable( 'IconSettings', 'Repository' );
-                $theme = $ini->variable( 'IconSettings', 'Theme' );
+
                 $groups = array( 'mimetype' => 'MimeIcons',
                                  'class' => 'ClassIcons',
                                  'classgroup' => 'ClassGroupIcons',
@@ -106,15 +105,7 @@ class eZWordToImageOperator
                     $theme = $ini->variable( $configGroup, 'Theme' );
                 }
 
-                // Load icon settings from the theme
-                $themeINI = eZINI::instance( 'icon.ini', $repository . '/' . $theme );
-
-                $sizes = $themeINI->variable( 'IconSettings', 'Sizes' );
-                if ( $ini->hasVariable( 'IconSettings', 'Sizes' ) )
-                {
-                    $sizes = array_merge( $sizes,
-                                          $ini->variable( 'IconSettings', 'Sizes' ) );
-                }
+                $sizes = $ini->variable( 'IconSettings', 'Sizes' );
 
                 $sizePathList = array();
                 $sizeInfoList = array();
@@ -150,28 +141,19 @@ class eZWordToImageOperator
                 $map = array();
 
                 // Load mapping from theme
-                if ( $themeINI->hasVariable( $configGroup, $mapName ) )
-                {
-                    $map = array_merge( $map,
-                                        $themeINI->variable( $configGroup, $mapName ) );
-                }
-                // Load override mappings if they exist
                 if ( $ini->hasVariable( $configGroup, $mapName ) )
                 {
-                    $map = array_merge( $map,
-                                        $ini->variable( $configGroup, $mapName ) );
+                    $map = $ini->variable( $configGroup, $mapName );
                 }
 
                 $default = false;
-                if ( $themeINI->hasVariable( $configGroup, 'Default' ) )
-                    $default = $themeINI->variable( $configGroup, 'Default' );
                 if ( $ini->hasVariable( $configGroup, 'Default' ) )
                     $default = $ini->variable( $configGroup, 'Default' );
 
                 // Build return value
-                $iconInfo = array( 'repository' => $repository,
-                                   'theme' => $theme,
-                                   'theme_path' => $repository . '/' . $theme,
+                $iconInfo = array( 'repository' => '',
+                                   'theme' => '',
+                                   'theme_path' => 'icons',
                                    'size_path_list' => $sizePathList,
                                    'size_info_list' => $sizeInfoList,
                                    'icons' => $map,
@@ -184,30 +166,23 @@ class eZWordToImageOperator
             case 'flag_icon':
             {
                 $ini = eZINI::instance( 'icon.ini' );
-                $repository = $ini->variable( 'FlagIcons', 'Repository' );
                 $theme = $ini->variable( 'FlagIcons', 'Theme' );
-
-                // Load icon settings from the theme
-                $themeINI = eZINI::instance( 'icon.ini', $repository . '/' . $theme );
-
-                $iconFormat = $themeINI->variable( 'FlagIcons', 'IconFormat' );
-                if ( $ini->hasVariable( 'FlagIcons', 'IconFormat' ) )
-                {
-                    $iconFormat = $ini->variable( 'FlagIcons', 'IconFormat' );
-                }
+                $iconFormat = $ini->variable( 'FlagIcons', 'IconFormat' );
 
                 $icon = $operatorValue . '.' . $iconFormat;
-                $iconPath = $repository . '/' . $theme . '/' . $icon;
-                if ( !is_readable( $iconPath ) )
+
+                $iconPath = 'icons/' . $theme . '/' . $icon;
+                $iconPath = eZURLOperator::eZImage( $tpl, $iconPath, 'ezimage', false );
+
+                // fallback to default icon
+                if ( !is_readable( '.' . $iconPath ) )
                 {
-                    $defaultIcon = $themeINI->variable( 'FlagIcons', 'DefaultIcon' );
-                    $iconPath = $repository . '/' . $theme . '/' . $defaultIcon . '.' . $iconFormat;
+                    $defaultIcon = $ini->variable( 'FlagIcons', 'DefaultIcon' );
+                    $iconPath = 'icons/' . $theme . '/' . $defaultIcon . '.' . $iconFormat;
+                    $iconPath = eZURLOperator::eZImage( $tpl, $iconPath, 'ezimage', false );
                 }
-                if ( strlen( eZSys::wwwDir() ) > 0 )
-                    $wwwDirPrefix = htmlspecialchars( eZSys::wwwDir(), ENT_COMPAT, 'UTF-8' ) . '/';
-                else
-                    $wwwDirPrefix = '/';
-                $operatorValue = $wwwDirPrefix . $iconPath;
+
+                $operatorValue = $iconPath;
             } break;
 
             case 'mimetype_icon':
@@ -223,23 +198,6 @@ class eZWordToImageOperator
                     $returnURIOnly = false;
 
                 $ini = eZINI::instance( 'icon.ini' );
-                $repository = $ini->variable( 'IconSettings', 'Repository' );
-                $theme = $ini->variable( 'IconSettings', 'Theme' );
-                $groups = array( 'mimetype_icon' => 'MimeIcons',
-                                 'class_icon' => 'ClassIcons',
-                                 'classgroup_icon' => 'ClassGroupIcons',
-                                 'action_icon' => 'ActionIcons',
-                                 'icon' => 'Icons' );
-                $configGroup = $groups[$operatorName];
-
-                // Check if the specific icon type has a theme setting
-                if ( $ini->hasVariable( $configGroup, 'Theme' ) )
-                {
-                    $theme = $ini->variable( $configGroup, 'Theme' );
-                }
-
-                // Load icon settings from the theme
-                $themeINI = eZINI::instance( 'icon.ini', $repository . '/' . $theme );
 
                 if ( isset( $operatorParameters[0] ) )
                 {
@@ -248,18 +206,12 @@ class eZWordToImageOperator
                 else
                 {
                     $sizeName = $ini->variable( 'IconSettings', 'Size' );
-                    // Check if the specific icon type has a size setting
-                    if ( $ini->hasVariable( $configGroup, 'Size' ) )
-                    {
-                        $theme = $ini->variable( $configGroup, 'Size' );
-                    }
                 }
 
-                $sizes = $themeINI->variable( 'IconSettings', 'Sizes' );
+                $sizes = [];
                 if ( $ini->hasVariable( 'IconSettings', 'Sizes' ) )
                 {
-                    $sizes = array_merge( $sizes,
-                                          $ini->variable( 'IconSettings', 'Sizes' ) );
+                    $sizes = $ini->variable( 'IconSettings', 'Sizes' );
                 }
 
                 if ( isset( $sizes[$sizeName] ) )
@@ -331,13 +283,9 @@ class eZWordToImageOperator
                                                       strtolower( $operatorValue ) );
                 }
 
-                $iconPath = '/' . $repository . '/' . $theme;
-                $iconPath .= '/' . $sizePath;
-                $iconPath .= '/' . $icon;
+                $iconPath = 'icons/' . $sizePath . '/' . $icon;
+                $iconPath = eZURLOperator::eZImage( $tpl, $iconPath, 'ezimage', false );
 
-                $wwwDirPrefix = "";
-                if ( strlen( eZSys::wwwDir() ) > 0 )
-                    $wwwDirPrefix = eZSys::wwwDir();
                 $sizeText = '';
                 if ( $width !== false and $height !== false )
                 {
@@ -355,9 +303,9 @@ class eZWordToImageOperator
                 }
 
                 if ( $returnURIOnly )
-                    $operatorValue = $wwwDirPrefix . $iconPath;
+                    $operatorValue = $iconPath;
                 else
-                    $operatorValue = '<img ' . $class . 'src="' . htmlspecialchars( $wwwDirPrefix . $iconPath, ENT_COMPAT, 'UTF-8' ) . '"' . $sizeText . ' alt="' .  htmlspecialchars( $altText, ENT_COMPAT, 'UTF-8' ) . '" title="' . htmlspecialchars( $altText ) . '" />';
+                    $operatorValue = '<img ' . $class . 'src="' . htmlspecialchars( $iconPath, ENT_COMPAT, 'UTF-8' ) . '"' . $sizeText . ' alt="' .  htmlspecialchars( $altText, ENT_COMPAT, 'UTF-8' ) . '" title="' . htmlspecialchars( $altText ) . '" />';
             } break;
 
             default:
@@ -389,10 +337,9 @@ class eZWordToImageOperator
         $map = array();
 
         // Load mapping from theme
-        if ( $themeINI->hasVariable( $iniGroup, $mapName ) )
+        if ( $ini->hasVariable( $iniGroup, $mapName ) )
         {
-            $map = array_merge( $map,
-                                $themeINI->variable( $iniGroup, $mapName ) );
+            $map = $ini->variable( $iniGroup, $mapName );
         }
         // Load override mappings if they exist
         if ( $ini->hasVariable( $iniGroup, $mapName ) )
@@ -408,8 +355,6 @@ class eZWordToImageOperator
         }
         if ( $icon === false )
         {
-            if ( $themeINI->hasVariable( $iniGroup, 'Default' ) )
-                $icon = $themeINI->variable( $iniGroup, 'Default' );
             if ( $ini->hasVariable( $iniGroup, 'Default' ) )
                 $icon = $ini->variable( $iniGroup, 'Default' );
         }
@@ -437,17 +382,10 @@ class eZWordToImageOperator
     {
         $map = array();
 
-        // Load mapping from theme
-        if ( $themeINI->hasVariable( $iniGroup, $mapName ) )
-        {
-            $map = array_merge( $map,
-                                $themeINI->variable( $iniGroup, $mapName ) );
-        }
         // Load override mappings if they exist
         if ( $ini->hasVariable( $iniGroup, $mapName ) )
         {
-            $map = array_merge( $map,
-                                $ini->variable( $iniGroup, $mapName ) );
+            $map = $ini->variable( $iniGroup, $mapName );
         }
 
         $icon = false;
@@ -473,8 +411,6 @@ class eZWordToImageOperator
         // No icon? If so use default
         if ( $icon === false )
         {
-            if ( $themeINI->hasVariable( $iniGroup, 'Default' ) )
-                $icon = $themeINI->variable( $iniGroup, 'Default' );
             if ( $ini->hasVariable( $iniGroup, 'Default' ) )
                 $icon = $ini->variable( $iniGroup, 'Default' );
         }
