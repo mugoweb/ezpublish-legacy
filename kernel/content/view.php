@@ -84,12 +84,19 @@ $validation = array( 'processed' => false,
 if ( isset( $Params['AttributeValidation'] ) )
     $validation = $Params['AttributeValidation'];
 
+// Get layout for the cache key
 $res = eZTemplateDesignResource::instance();
 $keys = $res->keys();
 if ( isset( $keys['layout'] ) )
+{
     $layout = $keys['layout'];
+}
 else
+{
     $layout = false;
+}
+// Making sure we have the layout design key even if it's 'false'
+$res->setKeys( array( array( 'layout', $layout ) ) );
 
 $viewParameters = array(
     'offset' => $Offset,
